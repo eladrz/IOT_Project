@@ -14,3 +14,13 @@ Application/ Data set:
 4. location
 5. Last Updated
 * Optional Data
+
+mqtt broker code in the terminal:
+systemctl status mosquitto.service - check status if its on or off
+systemctl stop mosquitto.service - to shut broker down
+systemctl start mosquitto.service - turn on the broker
+mosquitto -v - see the action that broker does in real time
+mosquitto_pub -h <broker_address> -p <broker_port> -t <topic_name> -m "your_message" : to publish a message and the default port is 1883 and default address is localhost.
+mosquitto_sub -h <broker_address> -p <broker_port> -t <topic_name> : to listen a specific topic and also here the same default
+mosquitto_sub -h <broker_address> -p <broker_port> -t <topic_name> -u <username> -P <password> : the same with protection
+ 

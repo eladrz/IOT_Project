@@ -9,7 +9,8 @@
 // Callback function for handling MQTT messages
 void on_message_callback(struct mosquitto *mosq, void *obj, const struct mosquitto_message *message) {
     if (message->payloadlen) {
-        std::cout << "Received message on topic '" << message->topic << "': " << (char *)message->payload << std::endl;
+    	  const char *payload_str = (const char *)message->payload;
+        std::cout << "Received message on topic '" << message->topic << "': " << payload_str << std::endl;
     } else {
         std::cout << "Empty message received on topic '" << message->topic << "'!" << std::endl;
     }
