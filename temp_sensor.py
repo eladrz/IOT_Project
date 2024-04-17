@@ -8,6 +8,7 @@ KEEP_AKIVE_SLEEP = 2
 TOPIC = "sensors/temperature"
 BROKER_ADDRESS = "localhost"
 ID_SENSOR = "temperature_1"
+
 if __name__ == "__main__":
     # Create an instance of SensorClient
     client = SensorClient(ID_SENSOR ,BROKER_ADDRESS ,TOPIC ,KEEP_ALIVE_TOPIC ,KEEP_AKIVE_SLEEP)
