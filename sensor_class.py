@@ -14,6 +14,7 @@ class SensorClient:
         self.start_time = time.time()
         self.alive_topic = alive_topic
         self.keep_alive_interval = keep_alive_interval
+        self.source = None  # Initialize source variable
       
     def connect(self):
         self.client.connect(self.broker_address)
@@ -24,22 +25,34 @@ class SensorClient:
         self.client.subscribe(self.topic)
 
     def on_message(self, client, userdata, msg):
-        print(msg.topic+" "+str(msg.payload))
+        if self.source == "rgb":
+            rgb_data = msg.payload.decode('utf-8')
+            print(msg.topic+ ": received RGB data:", rgb_data)  # Print received RGB data
+        else:
+            print(msg.topic+": "+str(msg.payload))
 
     def keepAlive(self):
         while True:
             current_time = time.time()
             uptime_seconds = int(current_time - self.start_time)
-            self.client.publish(self.alive_topic, str(uptime_seconds))
+            massage = self.source + ": " + str(uptime_seconds) + " seconds alive"
+            self.client.publish(self.alive_topic, massage)
             time.sleep(self.keep_alive_interval)  # Sleep for the keep-alive interval
 
     def simulate_temperature_sensor(self, min_temp, max_temp,sleep):
+        self.source = "temp"
         alive_thread = threading.Thread(target=self.keepAlive)
         alive_thread.start()
         while True:
             temperature = random.uniform(min_temp, max_temp)  # Simulating temperature data
             self.client.publish(self.topic, str(round(temperature, 2)))
             time.sleep(sleep)  # Simulate sensor update interval
+        alive_thread.join()
+        
+    def simulate_rgb_sensor(self):
+        self.source = "rgb"
+        alive_thread = threading.Thread(target=self.keepAlive)
+        alive_thread.start()
         alive_thread.join()
 
     def disconnect(self):

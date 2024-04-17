@@ -1,13 +1,10 @@
 from sensor_class import SensorClient
 
-CHECK_TEMP_SEND = 3
-MIN_TEMP = 15
-MAX_TEMP = 35
 KEEP_ALIVE_TOPIC = "keepalive"
 KEEP_ALIVE_SLEEP = 2
-TOPIC = "sensors/temperature"
+TOPIC = "sensors/RGB"
 BROKER_ADDRESS = "localhost"
-ID_SENSOR = "temperature_1"
+ID_SENSOR = "RGB_1"
 
 if __name__ == "__main__":
     # Create an instance of SensorClient
@@ -18,7 +15,7 @@ if __name__ == "__main__":
 
     try:
         # Simulate the sensor
-        client.simulate_temperature_sensor(MIN_TEMP,MAX_TEMP,CHECK_TEMP_SEND)
+        client.simulate_rgb_sensor()
     except KeyboardInterrupt:
         # Handle keyboard interrupt to gracefully disconnect
         client.disconnect()
