@@ -1,4 +1,4 @@
-sensors:
+qsensors:
 1. ID
 2. keep Alive
 3. Data Send Time
