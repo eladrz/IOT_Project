@@ -5,6 +5,7 @@ import threading
 import tkinter as tk
 from lamp_class import RGBLamp
 
+
 class SensorClient:
     def __init__(self, client_id, broker_address, topic, alive_topic, keep_alive_interval):
         self.client_id = client_id
@@ -18,7 +19,7 @@ class SensorClient:
         self.keep_alive_interval = keep_alive_interval
         self.source = None  # Initialize source variable
         self.lamp = None
-      
+
     def connect(self):
         self.client.connect(self.broker_address)
         self.client.loop_start()
@@ -39,31 +40,32 @@ class SensorClient:
         while True:
             current_time = time.time()
             uptime_seconds = int(current_time - self.start_time)
-            massage = self.client_id + ": " + str(uptime_seconds) + " seconds alive"
+            massage = self.client_id + ": " + \
+                str(uptime_seconds) + " seconds alive"
             self.client.publish(self.alive_topic, massage)
-            time.sleep(self.keep_alive_interval)  # Sleep for the keep-alive interval
+            # Sleep for the keep-alive interval
+            time.sleep(self.keep_alive_interval)
 
-    def simulate_temperature_sensor(self, min_temp, max_temp,sleep):
+    def simulate_temperature_sensor(self, min_temp, max_temp, sleep):
         self.source = "temp"
         alive_thread = threading.Thread(target=self.keepAlive)
         alive_thread.start()
         while True:
-            temperature = random.uniform(min_temp, max_temp)  # Simulating temperature data
+            # Simulating temperature data
+            temperature = random.uniform(min_temp, max_temp)
             self.client.publish(self.topic, str(round(temperature, 2)))
             time.sleep(sleep)  # Simulate sensor update interval
         alive_thread.join()
-        
+
     def simulate_rgb_sensor(self):
         self.source = "rgb"
         alive_thread = threading.Thread(target=self.keepAlive)
         alive_thread.start()
-        root = tk.Tk()
-        self.lamp = RGBLamp(root)
-        root.mainloop()
+        # root = tk.Tk()
+        # self.lamp = RGBLamp(root)
+        # root.mainloop()
         alive_thread.join()
 
     def disconnect(self):
         self.client.loop_stop()
         self.client.disconnect()
-
-        
