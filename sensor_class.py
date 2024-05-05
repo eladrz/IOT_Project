@@ -4,6 +4,7 @@ import paho.mqtt.client as mqtt
 import threading
 import tkinter as tk
 from lamp_class import RGBLamp
+import sqlMethodes
 
 
 class SensorClient:
@@ -18,30 +19,36 @@ class SensorClient:
         self.alive_topic = alive_topic
         self.keep_alive_interval = keep_alive_interval
         self.source = None  # Initialize source variable
-        self.lamp = None
+        # self.lamp = None
 
     def connect(self):
         self.client.connect(self.broker_address)
         self.client.loop_start()
 
     def on_connect(self, client, userdata, flags, rc):
-        print("Connected with result code "+str(rc))
+        print("Connected with result code " + str(rc))
         self.client.subscribe(self.topic)
 
     def on_message(self, client, userdata, msg):
         if self.source == "rgb":
-            rgb_data = msg.payload.decode('utf-8')
-            print(msg.topic + ": received RGB data:", rgb_data)
-            self.lamp.get_color(rgb_data)
-        else:
-            print(msg.topic+": "+str(msg.payload))
+            payload = msg.payload.decode('utf-8')
+            if payload == "on":
+                print("RGB on")
+            elif payload == "off":
+                print("RGB off")
+            else:
+                print(msg.topic + ": received RGB data:", payload)
+
+            # self.lamp.get_color(rgb_data)
+        elif self.source == "temp":
+            print(msg.topic + ": " + str(msg.payload))
 
     def keepAlive(self):
         while True:
             current_time = time.time()
             uptime_seconds = int(current_time - self.start_time)
             massage = self.client_id + ": " + \
-                str(uptime_seconds) + " seconds alive"
+                      str(uptime_seconds) + " seconds alive"
             self.client.publish(self.alive_topic, massage)
             # Sleep for the keep-alive interval
             time.sleep(self.keep_alive_interval)
@@ -54,6 +61,17 @@ class SensorClient:
             # Simulating temperature data
             temperature = random.uniform(min_temp, max_temp)
             self.client.publish(self.topic, str(round(temperature, 2)))
+            time.sleep(sleep)  # Simulate sensor update interval
+        alive_thread.join()
+
+    def simulate_humidity_sensor(self, min_temp, max_temp, sleep):
+        self.source = "humidity"
+        alive_thread = threading.Thread(target=self.keepAlive)
+        alive_thread.start()
+        while True:
+            # Simulating temperature data
+            humidity = random.uniform(min_temp, max_temp)
+            self.client.publish(self.topic, str(round(humidity, 2)))
             time.sleep(sleep)  # Simulate sensor update interval
         alive_thread.join()
 

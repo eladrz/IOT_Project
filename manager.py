@@ -32,8 +32,8 @@ def on_message(client, userdata, message):
             value = value.split("(")[1].split(")")[0]
         status = sqlMethodes.get_device_status(device)
 
-    if device == 'DH-11_Temperature' and value > 28:
-        turn_on_AC()
+    # if device == 'DH-11_Temperature' and value > 28:
+    #     turn_on_AC()
     # Update the database
     sqlMethodes.update_db(device, status, value)
 

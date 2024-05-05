@@ -44,6 +44,7 @@ def init_db(database):
             `name` TEXT NOT NULL,
             `LastUpdated` TEXT NOT NULL,
             `status` TEXT NOT NULL,
+            `keepAlive` TEXT NOT NULL,
             FOREIGN KEY(`name`) REFERENCES `iot_devices`(`name`)
         );""",
         """CREATE TABLE IF NOT EXISTS `iot_devices` (
@@ -139,8 +140,6 @@ def update_db(device, status, value):
         print(f"Database updated name {device}")
     else:
         print("Error! cannot create the database connection.")
-
-
 
 def get_device_status(device_name):
     conn = create_connection()

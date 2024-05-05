@@ -1,9 +1,11 @@
 from sensor_class import SensorClient
+BROKER_ADDRESS = "broker.hivemq.com"
+TOPIC = "DvirH/Light/RGB"
 
 KEEP_ALIVE_TOPIC = "keepalive"
 KEEP_ALIVE_SLEEP = 2
-TOPIC = "sensors/RGB"
-BROKER_ADDRESS = "localhost"
+# TOPIC = "sensors/RGB"
+# BROKER_ADDRESS = "localhost"
 ID_SENSOR = "RGB_1"
 
 if __name__ == "__main__":
