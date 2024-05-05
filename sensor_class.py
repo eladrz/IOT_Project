@@ -18,7 +18,7 @@ class SensorClient:
         self.alive_topic = alive_topic
         self.keep_alive_interval = keep_alive_interval
         self.source = None  # Initialize source variable
-        self.lamp = None
+        # self.lamp = None
 
     def connect(self):
         self.client.connect(self.broker_address)
@@ -32,8 +32,8 @@ class SensorClient:
         if self.source == "rgb":
             rgb_data = msg.payload.decode('utf-8')
             print(msg.topic + ": received RGB data:", rgb_data)
-            self.lamp.get_color(rgb_data)
-        else:
+            # self.lamp.get_color(rgb_data)
+        if self.source == "temp":
             print(msg.topic+": "+str(msg.payload))
 
     def keepAlive(self):
