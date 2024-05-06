@@ -2,9 +2,8 @@ import time
 import random
 import paho.mqtt.client as mqtt
 import threading
-import tkinter as tk
-from lamp_class import RGBLamp
-import sqlMethodes
+# import tkinter as tk
+# from lamp_class import RGBLamp
 
 
 class SensorClient:
@@ -69,7 +68,7 @@ class SensorClient:
         alive_thread = threading.Thread(target=self.keepAlive)
         alive_thread.start()
         while True:
-            # Simulating temperature data
+            # Simulating humidity data
             humidity = random.uniform(min_temp, max_temp)
             self.client.publish(self.topic, str(round(humidity, 2)))
             time.sleep(sleep)  # Simulate sensor update interval
@@ -82,6 +81,17 @@ class SensorClient:
         # root = tk.Tk()
         # self.lamp = RGBLamp(root)
         # root.mainloop()
+        alive_thread.join()
+
+    def simulate_waterLevel_sensor(self, min_temp, max_temp, sleep):
+        self.source = "water"
+        alive_thread = threading.Thread(target=self.keepAlive)
+        alive_thread.start()
+        while True:
+            # Simulating water data
+            water = random.uniform(min_temp, max_temp)
+            self.client.publish(self.topic, str(round(water, 2)))
+            time.sleep(sleep)  # Simulate sensor update interval
         alive_thread.join()
 
     def disconnect(self):

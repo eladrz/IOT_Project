@@ -12,6 +12,8 @@ def on_connect(client, userdata, flags, rc):
 def on_message(client, userdata, message):
     topic = message.topic
     device = topic.split("/")[-1]
+    if topic == 'keepAlive': #ToDo check the keepAlive topic
+        sqlMethodes.update_keepAlive()
     value_or_status = message.payload.decode("utf-8")
     # Extract relevant information from the message
     if value_or_status == 'on':
