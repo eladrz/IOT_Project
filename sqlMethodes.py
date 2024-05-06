@@ -38,13 +38,13 @@ def create_table(conn, create_table_sql):
         print(e)
 
 
-def init_db(database):
+def init_db(database):  # Todo update keepAlive
     tables = [
         """CREATE TABLE IF NOT EXISTS `data` (
             `name` TEXT NOT NULL,
-            `LastUpdated` TEXT NOT NULL,
             `status` TEXT NOT NULL,
             `keepAlive` TEXT NOT NULL,
+            `lastUpdated` TEXT NOT NULL,
             FOREIGN KEY(`name`) REFERENCES `iot_devices`(`name`)
         );""",
         """CREATE TABLE IF NOT EXISTS `iot_devices` (
@@ -74,26 +74,36 @@ def init_db(database):
 def update_data_database(deviceName, status, db_file="IoT_DB.db"):
     conn = sqlite3.connect(db_file)
     c = conn.cursor()
-    c.execute(f"INSERT INTO data (LastUpdated,status) VALUES (?,?,?) where Name = {deviceName}",
+    c.execute(f"INSERT INTO data (lastUpdated,status) VALUES (?,?) where Name = {deviceName}",
               (status, timestamp()))
     conn.commit()
     conn.close()
     print("db updated")
 
 
-def add_IOT_data(name, status):
+def update_keepAlive(deviceName, keepAlive, db_file="IoT_DB.db"):
+    conn = sqlite3.connect(db_file)
+    c = conn.cursor()
+    c.execute("UPDATE data SET keepAlive = ?, lastUpdated = ? WHERE name = ?",
+              (keepAlive, timestamp(), deviceName))
+    conn.commit()
+    conn.close()
+    print("keepAlive updated in DB")
+
+
+def add_IOT_data(name, status,keepAlive):
     """
     Add new IOT device data into the data table
     :param conn:
     :param :
     :return: last row id
     """
-    sql = ''' INSERT INTO data(name, LastUpdated, status)
-              VALUES(?,?,?) '''
+    sql = ''' INSERT INTO data(name, lastUpdated, status,keepAlive)
+              VALUES(?,?,?,?) '''
     conn = create_connection()
     if conn is not None:
         cur = conn.cursor()
-        cur.execute(sql, [name, timestamp(), status])
+        cur.execute(sql, [name, timestamp(), status,keepAlive])
         conn.commit()
         conn.close()
         return
@@ -121,14 +131,14 @@ def create_IOT_dev(name, value, units, location, dev_pub_topic, dev_sub_topic):
         print("Error! cannot create the database connection.")
 
 
-def insert_new_device(name, status, value, units, location, dev_pub_topic, dev_sub_topic):
+def insert_new_device(name, status, keepAlive, value, units, location, dev_pub_topic, dev_sub_topic):
+    add_IOT_data(name, status,keepAlive)
     create_IOT_dev(name, value, units, location, dev_pub_topic, dev_sub_topic)
-    add_IOT_data(name, status)
     return
 
 
 def update_db(device, status, value):
-    sql1 = f'''UPDATE data SET status = ?, LastUpdated = ? WHERE name = ? '''
+    sql1 = f'''UPDATE data SET status = ?, lastUpdated = ? WHERE name = ? '''
     sql2 = f'''UPDATE iot_devices SET value = ? WHERE name = ? '''
     conn = create_connection()
     if conn is not None:
@@ -140,6 +150,7 @@ def update_db(device, status, value):
         print(f"Database updated name {device}")
     else:
         print("Error! cannot create the database connection.")
+
 
 def get_device_status(device_name):
     conn = create_connection()
@@ -157,6 +168,7 @@ def get_device_status(device_name):
     finally:
         conn.close()
 
+
 def get_device_value(device_name):
     conn = create_connection()
     c = conn.cursor()
@@ -173,11 +185,14 @@ def get_device_value(device_name):
     finally:
         conn.close()
 
+
 if __name__ == '__main__':
     database = "IoT_DB.db"  # Replace 'your_database_file_path.db' with your actual database file path
     # init_db(database)
-    # insert_new_device(name="RGB", status='Off', value='0', units='', location='Room1', dev_pub_topic='',
+    # insert_new_device(name="RGB", status='Off', keepAlive='0', value='(0,0,0)', units='(R,G,B)', location='Room1', dev_pub_topic='',
     #                   dev_sub_topic='DvirH/Light/RGB')
-    # insert_new_device("DH-11_Temperature", 'Off', '0', 'Cel', 'Room1', 'DvirH/Temperature', '')
-    # insert_new_device("DH-11_Humidity", 'Off', '0', '%', 'Room1', 'DvirH/Humidity', '')
-    # insert_new_device("Airconditioner", 'Off', '25', 'Cel', 'Room1', 'DvirH/Airconditioner', '')
+    # insert_new_device("DH-11_Temperature", 'Off', '0', '0', 'º', 'Room1', 'DvirH/Temperature', '')
+    # insert_new_device("DH-11_Humidity", 'Off', '0', '0', '%', 'Room1', 'DvirH/Humidity', '')
+    # insert_new_device("Airconditioner", 'Off', '0', '25', 'º', 'Room1', 'DvirH/Airconditioner', '')
+    insert_new_device(name="WaterLevel", status='Off', keepAlive='0', value='0', units='mm', location='Room1', dev_pub_topic='DvirH/WaterLevel',
+                      dev_sub_topic='')
