@@ -2,9 +2,9 @@ import time
 import random
 import paho.mqtt.client as mqtt
 import threading
-import tkinter as tk
-from lamp_class import RGBLamp
-import sqlMethodes
+#import tkinter as tk
+#from lamp_class import RGBLamp
+from sqlclass import IoTDatabase
 
 
 class SensorClient:
@@ -18,7 +18,8 @@ class SensorClient:
         self.start_time = time.time()
         self.alive_topic = alive_topic
         self.keep_alive_interval = keep_alive_interval
-        self.source = None  # Initialize source variable
+        self.source = None
+        self.db = IoTDatabase()
         # self.lamp = None
 
     def connect(self):
@@ -33,6 +34,7 @@ class SensorClient:
         if self.source == "rgb":
             payload = msg.payload.decode('utf-8')
             if payload == "on":
+                self.db.update_data
                 print("RGB on")
             elif payload == "off":
                 print("RGB off")
