@@ -57,7 +57,7 @@ class IoTDatabase:
         for table in tables:
             self.create_table(table)
  
-    def update_data(self, sys_id, name=None, status=None, keepAlive=None):
+    def update_data(self, sys_id, name=None, status=None, keepAlive=None, value = None):
         conn = self.create_connection()
         if conn is not None:
             try:
@@ -92,9 +92,12 @@ class IoTDatabase:
                             c.execute("UPDATE iot_devices SET name=? WHERE sys_id=?", (name, sys_id))
                             conn.commit()
                     
-                        print("Database updated")
                     else:
-                        print("No updates provided.")
+                        if value is not None:
+                            c.execute("UPDATE iot_devices SET value=? WHERE sys_id=?", (value, sys_id))
+                            conn.commit()
+                        else:
+                            print("No updates provided.")
                 else:
                     print(f"Error! System ID {sys_id} not found in the database.")
             except sqlite3.Error as e:
@@ -109,7 +112,6 @@ class IoTDatabase:
         device = ''' INSERT INTO iot_devices(sys_id, name, value, units, location, dev_pub_topic, dev_sub_topic)
                   VALUES(?,? ,? ,? ,? ,?, ?) '''
                   
-                          
         conn = self.create_connection()
         if conn is not None:
             try:

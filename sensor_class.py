@@ -34,12 +34,14 @@ class SensorClient:
         if self.source == "rgb":
             payload = msg.payload.decode('utf-8')
             if payload == "on":
-                self.db.update_data
+                self.db.update_data(int(self.client_id),status="on")
                 print("RGB on")
             elif payload == "off":
+                self.db.update_data(int(self.client_id),status="off")
                 print("RGB off")
             else:
                 print(msg.topic + ": received RGB data:", payload)
+                self.db.update_data(int(self.client_id),value=payload)
 
             # self.lamp.get_color(rgb_data)
         elif self.source == "temp":
@@ -52,6 +54,7 @@ class SensorClient:
             massage = self.client_id + ": " + \
                       str(uptime_seconds) + " seconds alive"
             self.client.publish(self.alive_topic, massage)
+            self.db.update_data(int(self.client_id),keepAlive=str(uptime_seconds) + " sec")
             # Sleep for the keep-alive interval
             time.sleep(self.keep_alive_interval)
 

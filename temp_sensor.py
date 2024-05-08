@@ -10,7 +10,7 @@ KEEP_ALIVE_TOPIC = "keepalive"
 KEEP_ALIVE_SLEEP = 2
 # TOPIC = "sensors/temperature"
 # BROKER_ADDRESS = "localhost"
-ID_SENSOR = "temperature_1"
+ID_SENSOR = "2"
 
 if __name__ == "__main__":
     # Create an instance of SensorClient
