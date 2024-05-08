@@ -31,8 +31,8 @@ class SensorClient:
         self.client.subscribe(self.topic)
 
     def on_message(self, client, userdata, msg):
+        payload = msg.payload.decode('utf-8')
         if self.source == "rgb":
-            payload = msg.payload.decode('utf-8')
             if payload == "on":
                 self.db.update_data(int(self.client_id),status="on")
                 print("RGB on")
@@ -42,10 +42,11 @@ class SensorClient:
             else:
                 print(msg.topic + ": received RGB data:", payload)
                 self.db.update_data(int(self.client_id),value=payload)
-
             # self.lamp.get_color(rgb_data)
+            
         elif self.source == "temp":
-            print(msg.topic + ": " + str(msg.payload))
+            self.db.update_data(int(self.client_id),value=payload)
+            print(msg.topic + ": " + payload)
 
     def keepAlive(self):
         while True:
