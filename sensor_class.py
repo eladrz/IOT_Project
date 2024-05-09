@@ -6,6 +6,7 @@ import threading
 #from lamp_class import RGBLamp
 from sqlclass import IoTDatabase
 
+TOPIC_MANAGER = "manager"
 
 class SensorClient:
     def __init__(self, client_id, broker_address, topic, alive_topic, keep_alive_interval):
@@ -32,21 +33,22 @@ class SensorClient:
 
     def on_message(self, client, userdata, msg):
         payload = msg.payload.decode('utf-8')
-        if self.source == "rgb":
-            if payload == "on":
-                self.db.update_data(int(self.client_id),status="on")
-                print("RGB on")
-            elif payload == "off":
-                self.db.update_data(int(self.client_id),status="off")
-                print("RGB off")
-            else:
-                print(msg.topic + ": received RGB data:", payload)
-                self.db.update_data(int(self.client_id),value=payload)
+        manager_msg =  self.source + "/" + self.client_id + "/" + payload
+       # if self.source == "rgb":
+           # if payload == "on":
+              #  self.db.update_data(int(self.client_id),status="on")
+             #   print("RGB on")
+            #elif payload == "off":
+            #    self.db.update_data(int(self.client_id),status="off")
+           #     print("RGB off")
+          #  else:
+          #      print(msg.topic + ": received RGB data:", payload)
+         #       self.db.update_data(int(self.client_id),value=payload)
             # self.lamp.get_color(rgb_data)
             
-        elif self.source == "temp":
-            self.db.update_data(int(self.client_id),value=payload)
-            print(msg.topic + ": " + payload)
+        #elif self.source == "temp":
+        #    self.db.update_data(int(self.client_id),value=payload)
+       #     print(msg.topic + ": " + payload)
 
     def keepAlive(self):
         while True:
@@ -55,7 +57,9 @@ class SensorClient:
             massage = self.client_id + ": " + \
                       str(uptime_seconds) + " seconds alive"
             self.client.publish(self.alive_topic, massage)
-            self.db.update_data(int(self.client_id),keepAlive=str(uptime_seconds) + " sec")
+            #self.db.update_data(int(self.client_id),keepAlive=str(uptime_seconds) + " sec")
+            manager_msg =  "keepalive"+ "/" + self.client_id + "/" + str(uptime_seconds) + " sec"
+            self.client.publish(TOPIC_MANAGER, manager_msg )
             # Sleep for the keep-alive interval
             time.sleep(self.keep_alive_interval)
 

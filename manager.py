@@ -1,17 +1,39 @@
 import paho.mqtt.client as mqtt
-from sensor_class import SensorClient
+from sqlclass import IoTDatabase
 
 TOPIC = "manager"
 BROKER_ADDRESS = "localhost"
 BROKER_PORT = 1883
 
+def IsKeepAlive(msg_split):
+	if "keepalive" in msg_split[0]:
+		db.update_data(int(msg_split[1]),keepAlive=msg_split[2])
+		return True
+	else:
+		return False
+
+def IsRGBSensor(msg_split):
+	if "rgb" in msg_split[0]:
+		if "on" or "off" in msg_split[2]:
+			db.update_data(int(msg_split[1]),status=msg_split[2])
+		else:
+			db.update_data(int(msg_split[1]),value=msg_split[2])
+		return True
+	else:
+		return False
+
 # Define a callback function to handle incoming messages
 def on_message_received(client, userdata, message):
-    print(f"Received message on topic '{message.topic}': {message.payload.decode()}")
-
-    # Add your code here to process the incoming message, e.g., update the database
-    # You can access the message topic and payload using message.topic and message.payload
-
+    #print(f"Received message on topic '{message.topic}': {message.payload.decode()}")
+    msg = message.payload.decode('utf-8')
+    # the 0 check if its keep alive, 1 - the ID, 2 - the msg
+    msg_split = msg.split('/')
+    IsKeepAlive(msg_split)
+    IsRGBSensor(msg_split)
+    
+    
+    
+    
 if __name__ == "__main__":
     # Initialize the MQTT client
     mqtt_client = mqtt.Client()
