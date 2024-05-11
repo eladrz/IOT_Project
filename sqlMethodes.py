@@ -1,7 +1,7 @@
 import sqlite3
 from sqlite3 import Error
 from datetime import datetime
-
+from icecream import ic
 
 def timestamp():
     return str(datetime.fromtimestamp(datetime.timestamp(datetime.now()))).split('.')[0]
@@ -17,7 +17,7 @@ def create_connection(db_file='IoT_DB.db'):
     try:
         conn = sqlite3.connect(db_file)
         pp = ('Conected to version: ' + sqlite3.version)
-        print(pp)
+        # print(pp)
         return conn
     except Error as e:
         print(e)
@@ -134,23 +134,43 @@ def create_IOT_dev(name, value, units, location, dev_pub_topic, dev_sub_topic):
 def insert_new_device(name, status, keepAlive, value, units, location, dev_pub_topic, dev_sub_topic):
     add_IOT_data(name, status,keepAlive)
     create_IOT_dev(name, value, units, location, dev_pub_topic, dev_sub_topic)
+    print(f"Inserted new device to DB: {name}")
     return
 
 
+# def update_db(device, status, value):
+#     sql1 = f'''UPDATE data SET status = ?, lastUpdated = ? WHERE name = ? '''
+#     sql2 = f'''UPDATE iot_devices SET value = ? WHERE name = ? '''
+#     conn = create_connection()
+#     if conn is not None:
+#         cur = conn.cursor()
+#         cur.execute(sql1, (status, timestamp(), device))
+#         cur.execute(sql2, (value, device))
+#         conn.commit()
+#         conn.close()
+#         print(f"Database updated: {device}\n")
+#     else:
+#         print("Error! cannot create the database connection.")
+
 def update_db(device, status, value):
-    sql1 = f'''UPDATE data SET status = ?, lastUpdated = ? WHERE name = ? '''
-    sql2 = f'''UPDATE iot_devices SET value = ? WHERE name = ? '''
+    sql_check_device = '''SELECT COUNT(*) FROM data WHERE name = ?'''
+    sql_update_data = '''UPDATE data SET status = ?, lastUpdated = ? WHERE name = ?'''
+    sql_update_iot_devices = '''UPDATE iot_devices SET value = ? WHERE name = ?'''
     conn = create_connection()
     if conn is not None:
         cur = conn.cursor()
-        cur.execute(sql1, (status, timestamp(), device))
-        cur.execute(sql2, (value, device))
-        conn.commit()
-        conn.close()
-        print(f"Database updated name {device}")
+        cur.execute(sql_check_device, (device,))
+        result = cur.fetchone()[0]
+        if result > 0:  # Device exists in the database
+            cur.execute(sql_update_data, (status, timestamp(), device))
+            cur.execute(sql_update_iot_devices, (value, device))
+            conn.commit()
+            conn.close()
+            print(f"Database updated: {device}\n")
+        else:
+            print(f"Device not found in the database: {device}\n")
     else:
         print("Error! cannot create the database connection.")
-
 
 def get_device_status(device_name):
     conn = create_connection()
@@ -187,12 +207,11 @@ def get_device_value(device_name):
 
 
 if __name__ == '__main__':
-    database = "IoT_DB.db"  # Replace 'your_database_file_path.db' with your actual database file path
-    # init_db(database)
-    # insert_new_device(name="RGB", status='Off', keepAlive='0', value='(0,0,0)', units='(R,G,B)', location='Room1', dev_pub_topic='',
-    #                   dev_sub_topic='DvirH/Light/RGB')
-    # insert_new_device("DH-11_Temperature", 'Off', '0', '0', 'º', 'Room1', 'DvirH/Temperature', '')
-    # insert_new_device("DH-11_Humidity", 'Off', '0', '0', '%', 'Room1', 'DvirH/Humidity', '')
-    # insert_new_device("Airconditioner", 'Off', '0', '25', 'º', 'Room1', 'DvirH/Airconditioner', '')
-    insert_new_device(name="WaterLevel", status='Off', keepAlive='0', value='0', units='mm', location='Room1', dev_pub_topic='DvirH/WaterLevel',
-                      dev_sub_topic='')
+    database = "IoT_DB.db"
+    init_db(database)
+    insert_new_device("RGB", 'off', '0', '(0,0,0)', '(R,G,B)', 'Room1', '','DvirH/Light/RGB')
+    insert_new_device("DH-11_Temperature", 'off', '0', '0', 'º', 'Room1', 'DvirH/Temperature', '')
+    insert_new_device("DH-11_Humidity", 'off', '0', '0', '%', 'Room1', 'DvirH/Humidity', '')
+    insert_new_device("Airconditioner", 'off', '0', '25', 'º', 'Room1', '', 'DvirH/Airconditioner')
+    insert_new_device("WaterLevel", 'off', '0', '0', 'mm', 'Room1', 'DvirH/WaterLevel','')
+    insert_new_device("DoorLock", 'off', '0', '', 'on/off', 'Room1', '', 'DvirH/DoorLock')

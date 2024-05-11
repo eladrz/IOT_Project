@@ -1,16 +1,14 @@
 from sensor_class import SensorClient
 
 BROKER_ADDRESS = "broker.hivemq.com"
-TOPIC = "DvirH/Temperature/DH-11_Temperature"
+TOPIC = "DvirH/DoorLock"
 
-CHECK_TEMP_SEND = 3
-MIN_TEMP = 15
-MAX_TEMP = 35
+CHECK_DoorLock_SEND = 3
 KEEP_ALIVE_TOPIC = "DvirH/keepalive"
 KEEP_ALIVE_SLEEP = 2
-# TOPIC = "sensors/temperature"
+# TOPIC = "sensors/humidity"
 # BROKER_ADDRESS = "localhost"
-ID_SENSOR = "temperature_1"
+ID_SENSOR = "doorLock_1"
 
 if __name__ == "__main__":
     # Create an instance of SensorClient
@@ -21,7 +19,7 @@ if __name__ == "__main__":
 
     try:
         # Simulate the sensor
-        client.simulate_temperature_sensor(MIN_TEMP, MAX_TEMP, CHECK_TEMP_SEND)
+        client.simulate_doorLock_sensor()
     except KeyboardInterrupt:
         # Handle keyboard interrupt to gracefully disconnect
         client.disconnect()

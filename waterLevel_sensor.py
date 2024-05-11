@@ -1,16 +1,16 @@
 from sensor_class import SensorClient
 
 BROKER_ADDRESS = "broker.hivemq.com"
-TOPIC = "DvirH/waterLevel"
+TOPIC = "DvirH/WaterLevel"
 
 CHECK_WATER_SEND = 3
 MIN_WATER = 0
 MAX_WATER = 500
 KEEP_ALIVE_TOPIC = "keepalive"
 KEEP_ALIVE_SLEEP = 2
-# TOPIC = "sensors/waterLevel"
+# TOPIC = "sensors/WaterLevel"
 # BROKER_ADDRESS = "localhost"
-ID_SENSOR = "waterLevel_1"
+ID_SENSOR = "WaterLevel_1"
 
 if __name__ == "__main__":
     # Create an instance of SensorClient

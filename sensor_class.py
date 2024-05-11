@@ -4,7 +4,7 @@ import paho.mqtt.client as mqtt
 import threading
 # import tkinter as tk
 # from lamp_class import RGBLamp
-
+from icecream import ic
 
 class SensorClient:
     def __init__(self, client_id, broker_address, topic, alive_topic, keep_alive_interval):
@@ -29,26 +29,36 @@ class SensorClient:
         self.client.subscribe(self.topic)
 
     def on_message(self, client, userdata, msg):
-        if self.source == "rgb":
+        if self.source == "RGB":
             payload = msg.payload.decode('utf-8')
             if payload == "on":
                 print("RGB on")
             elif payload == "off":
                 print("RGB off")
             else:
-                print(msg.topic + ": received RGB data:", payload)
+                rgb_values = payload.split("(")[1].split(")")[0]
+                print(f"RGB value:({rgb_values})")
+        elif self.source == "DoorLock":
+            payload = msg.payload.decode('utf-8')
+            if payload == 'on':
+                print(f"The door is locked")
+            else:
+                print(f"The door is unlocked")
 
-            # self.lamp.get_color(rgb_data)
         elif self.source == "temp":
+            print(msg.topic + ": " + str(msg.payload))
+        elif self.source == "humidity":
+            print(msg.topic + ": " + str(msg.payload))
+        elif self.source == "water":
             print(msg.topic + ": " + str(msg.payload))
 
     def keepAlive(self):
         while True:
             current_time = time.time()
             uptime_seconds = int(current_time - self.start_time)
-            massage = self.client_id + ": " + \
+            message = self.client_id + ": " + \
                       str(uptime_seconds) + " seconds alive"
-            self.client.publish(self.alive_topic, massage)
+            self.client.publish(self.alive_topic, message)
             # Sleep for the keep-alive interval
             time.sleep(self.keep_alive_interval)
 
@@ -58,7 +68,7 @@ class SensorClient:
         alive_thread.start()
         while True:
             # Simulating temperature data
-            temperature = random.uniform(min_temp, max_temp)
+            temperature = random.randint(min_temp, max_temp)
             self.client.publish(self.topic, str(round(temperature, 2)))
             time.sleep(sleep)  # Simulate sensor update interval
         alive_thread.join()
@@ -69,18 +79,24 @@ class SensorClient:
         alive_thread.start()
         while True:
             # Simulating humidity data
-            humidity = random.uniform(min_temp, max_temp)
+            humidity = random.randint(min_temp, max_temp)
             self.client.publish(self.topic, str(round(humidity, 2)))
             time.sleep(sleep)  # Simulate sensor update interval
         alive_thread.join()
 
     def simulate_rgb_sensor(self):
-        self.source = "rgb"
+        self.source = "RGB"
         alive_thread = threading.Thread(target=self.keepAlive)
         alive_thread.start()
         # root = tk.Tk()
         # self.lamp = RGBLamp(root)
         # root.mainloop()
+        alive_thread.join()
+
+    def simulate_doorLock_sensor(self):
+        self.source = "DoorLock"
+        alive_thread = threading.Thread(target=self.keepAlive)
+        alive_thread.start()
         alive_thread.join()
 
     def simulate_waterLevel_sensor(self, min_temp, max_temp, sleep):
@@ -89,7 +105,7 @@ class SensorClient:
         alive_thread.start()
         while True:
             # Simulating water data
-            water = random.uniform(min_temp, max_temp)
+            water = random.randint(min_temp, max_temp)
             self.client.publish(self.topic, str(round(water, 2)))
             time.sleep(sleep)  # Simulate sensor update interval
         alive_thread.join()

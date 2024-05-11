@@ -1,7 +1,7 @@
 import paho.mqtt.client as mqtt
 import random
 import sqlMethodes
-
+from icecream import ic
 
 # Callback functions
 def on_connect(client, userdata, flags, rc):
@@ -12,30 +12,36 @@ def on_connect(client, userdata, flags, rc):
 def on_message(client, userdata, message):
     topic = message.topic
     device = topic.split("/")[-1]
-    if topic == 'keepAlive': #ToDo check the keepAlive topic
-        sqlMethodes.update_keepAlive()
+    if topic == 'keepAlive':  #ToDo check the keepAlive topic
+        sqlMethodes.update_keepAlive(device,)
     value_or_status = message.payload.decode("utf-8")
     # Extract relevant information from the message
     if value_or_status == 'on':
         status = "on"
         value = sqlMethodes.get_device_value(device)
-        client.publish(topic, "on")
-        print(f"published on to topic {topic}")
         print(f"{device} turned on")
     elif value_or_status == 'off':
         status = "off"
         value = sqlMethodes.get_device_value(device)
-        client.publish(topic, "off")
-        print(f"published off to topic {topic}")
         print(f"{device} turned off")
     else:
         value = value_or_status
         if "rgb" in value:
             value = value.split("(")[1].split(")")[0]
+            print(f"RGB set to: ({value})")
+        elif device == 'Airconditioner':
+            print(f"AC set to {value}º")
+        elif device == 'WaterLevel':
+            print(f"The water level is {value}mm")
+        elif device == 'DH-11_Humidity':
+            print(f"Humidity in the room is: {value}%")
+        elif device == 'DH-11_Temperature':
+            print(f"Temp in the room is: {value}º")
+            if int(value) > 28:
+                turn_on_AC()
+
         status = sqlMethodes.get_device_status(device)
 
-    # if device == 'DH-11_Temperature' and value > 28:
-    #     turn_on_AC()
     # Update the database
     sqlMethodes.update_db(device, status, value)
 
@@ -47,7 +53,7 @@ def on_disconnect(rc):
 
 def turn_on_AC():
     sqlMethodes.update_db('Airconditioner', 'on', sqlMethodes.get_device_value('Airconditioner'))
-    client.publish("DvirH/Airconditioner", "on")
+    # client.publish("DvirH/Airconditioner", "on") ToDo check/make it work
     print("A/C turned on")
 
 
