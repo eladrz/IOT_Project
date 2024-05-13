@@ -71,7 +71,7 @@ class SensorClient:
             temperature = random.randint(min_temp, max_temp)
             self.client.publish(self.topic, str(temperature))
             time.sleep(sleep)  # Simulate sensor update interval
-        alive_thread.join()
+        # alive_thread.join()
 
     def simulate_humidity_sensor(self, min_temp, max_temp, sleep):
         self.source = "humidity"
@@ -82,7 +82,7 @@ class SensorClient:
             humidity = random.randint(min_temp, max_temp)
             self.client.publish(self.topic, str(humidity))
             time.sleep(sleep)  # Simulate sensor update interval
-        alive_thread.join()
+        # alive_thread.join()
 
     def simulate_rgb_sensor(self):
         self.source = "RGB"
@@ -91,13 +91,13 @@ class SensorClient:
         # root = tk.Tk()
         # self.lamp = RGBLamp(root)
         # root.mainloop()
-        alive_thread.join()
+        # alive_thread.join()
 
     def simulate_doorLock_sensor(self):
         self.source = "DoorLock"
         alive_thread = threading.Thread(target=self.keepAlive)
         alive_thread.start()
-        alive_thread.join()
+        # alive_thread.join()
 
     def simulate_waterLevel_sensor(self, min_temp, max_temp, sleep):
         self.source = "water"
@@ -108,7 +108,7 @@ class SensorClient:
             water = random.randint(min_temp, max_temp)
             self.client.publish(self.topic, str(water))
             time.sleep(sleep)  # Simulate sensor update interval
-        alive_thread.join()
+        # alive_thread.join()
 
     def disconnect(self):
         self.client.loop_stop()
