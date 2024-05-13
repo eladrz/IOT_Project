@@ -38,12 +38,18 @@ def on_message(client, userdata, message):
             print(f"AC set to {value}º")
         elif device == 'WaterLevel':
             print(f"The water level is {value}mm")
+            sqlMethodes.update_db(device, 'on', value)
+            return
         elif device == 'DH-11_Humidity':
             print(f"Humidity in the room is: {value}%")
+            sqlMethodes.update_db(device, 'on', value)
+            return
         elif device == 'DH-11_Temperature':
             print(f"Temp in the room is: {value}º")
+            sqlMethodes.update_db(device, 'on', value)
             if int(value) > 28:
                 turn_on_AC()
+            return
 
         status = sqlMethodes.get_device_status(device)
 
@@ -65,8 +71,8 @@ def turn_on_AC():
 if __name__ == "__main__":
     # MQTT settings
     broker_address = "broker.hivemq.com"
-    # topic = "DvirH/#"
-    topic = "DvirH/keepAlive/#"
+    topic = "DvirH/#"
+    # topic = "DvirH/keepAlive/#"
 
     # Create an MQTT client
     client_id = f'python-mqtt-{random.randint(0, 1000)}'

@@ -5,7 +5,7 @@ TOPIC = "DvirH/Temperature/DH-11_Temperature"
 
 CHECK_TEMP_SEND = 3
 MIN_TEMP = 15
-MAX_TEMP = 35
+MAX_TEMP = 40
 KEEP_ALIVE_TOPIC = "DvirH/keepAlive/DH-11_Temperature"
 KEEP_ALIVE_SLEEP = 2
 # TOPIC = "sensors/temperature"

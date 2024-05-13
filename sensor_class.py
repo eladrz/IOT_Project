@@ -71,7 +71,7 @@ class SensorClient:
             temperature = random.randint(min_temp, max_temp)
             self.client.publish(self.topic, str(temperature))
             time.sleep(sleep)  # Simulate sensor update interval
-            alive_thread.join()
+        alive_thread.join()
 
     def simulate_humidity_sensor(self, min_temp, max_temp, sleep):
         self.source = "humidity"
