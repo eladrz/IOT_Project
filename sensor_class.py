@@ -2,9 +2,9 @@ import time
 import random
 import paho.mqtt.client as mqtt
 import threading
+from icecream import ic
 # import tkinter as tk
 # from lamp_class import RGBLamp
-from icecream import ic
 
 class SensorClient:
     def __init__(self, client_id, broker_address, topic, alive_topic, keep_alive_interval):
@@ -69,9 +69,9 @@ class SensorClient:
         while True:
             # Simulating temperature data
             temperature = random.randint(min_temp, max_temp)
-            self.client.publish(self.topic, str(round(temperature, 2)))
+            self.client.publish(self.topic, str(temperature))
             time.sleep(sleep)  # Simulate sensor update interval
-        alive_thread.join()
+            alive_thread.join()
 
     def simulate_humidity_sensor(self, min_temp, max_temp, sleep):
         self.source = "humidity"
@@ -80,7 +80,7 @@ class SensorClient:
         while True:
             # Simulating humidity data
             humidity = random.randint(min_temp, max_temp)
-            self.client.publish(self.topic, str(round(humidity, 2)))
+            self.client.publish(self.topic, str(humidity))
             time.sleep(sleep)  # Simulate sensor update interval
         alive_thread.join()
 
@@ -106,7 +106,7 @@ class SensorClient:
         while True:
             # Simulating water data
             water = random.randint(min_temp, max_temp)
-            self.client.publish(self.topic, str(round(water, 2)))
+            self.client.publish(self.topic, str(water))
             time.sleep(sleep)  # Simulate sensor update interval
         alive_thread.join()
 

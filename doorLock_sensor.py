@@ -4,7 +4,7 @@ BROKER_ADDRESS = "broker.hivemq.com"
 TOPIC = "DvirH/DoorLock"
 
 CHECK_DoorLock_SEND = 3
-KEEP_ALIVE_TOPIC = "DvirH/keepalive"
+KEEP_ALIVE_TOPIC = "DvirH/keepAlive/DoorLock"
 KEEP_ALIVE_SLEEP = 2
 # TOPIC = "sensors/humidity"
 # BROKER_ADDRESS = "localhost"

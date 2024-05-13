@@ -3,17 +3,22 @@ import random
 import sqlMethodes
 from icecream import ic
 
+
 # Callback functions
 def on_connect(client, userdata, flags, rc):
-    print("Connected with result code " + str(rc))
+    print(f"Connected with result code {str(rc)}")
     client.subscribe(topic)
 
 
 def on_message(client, userdata, message):
     topic = message.topic
     device = topic.split("/")[-1]
-    if topic == 'keepAlive':  #ToDo check the keepAlive topic
-        sqlMethodes.update_keepAlive(device,)
+    if 'keepAlive' in topic:
+        KAmsg = message.payload.decode("utf-8")
+        parseKAmsg = KAmsg.split(":")
+        uptime_seconds = parseKAmsg[1].strip()
+        sqlMethodes.update_keepAlive(device, uptime_seconds)
+        return
     value_or_status = message.payload.decode("utf-8")
     # Extract relevant information from the message
     if value_or_status == 'on':
@@ -46,7 +51,7 @@ def on_message(client, userdata, message):
     sqlMethodes.update_db(device, status, value)
 
 
-def on_disconnect(rc):
+def on_disconnect(userdata, rc):
     if rc != 0:
         print("Unexpected disconnection.")
 
@@ -60,7 +65,8 @@ def turn_on_AC():
 if __name__ == "__main__":
     # MQTT settings
     broker_address = "broker.hivemq.com"
-    topic = "DvirH/#"
+    # topic = "DvirH/#"
+    topic = "DvirH/keepAlive/#"
 
     # Create an MQTT client
     client_id = f'python-mqtt-{random.randint(0, 1000)}'
