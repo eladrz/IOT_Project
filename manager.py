@@ -26,6 +26,7 @@ def IsRGBSensor(msg_split):
 def on_message_received(client, userdata, message):
     #print(f"Received message on topic '{message.topic}': {message.payload.decode()}")
     msg = message.payload.decode('utf-8')
+    print()
     # the 0 check if its keep alive, 1 - the ID, 2 - the msg
     msg_split = msg.split('/')
     IsKeepAlive(msg_split)
