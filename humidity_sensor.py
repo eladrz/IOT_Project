@@ -1,7 +1,7 @@
 from sensor_class import SensorClient
 
 # BROKER_ADDRESS = "broker.hivemq.com"
-BROKER_ADDRESS = '176.230.144.87'
+BROKER_ADDRESS = 'publicI_P_Address'
 USERNAME = 'dvirheller'
 PASSWORD = 'Dvir6375831'
 TOPIC = "DvirH/Humidity/DH-11_Humidity"
