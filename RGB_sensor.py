@@ -1,5 +1,9 @@
 from sensor_class import SensorClient
-BROKER_ADDRESS = "broker.hivemq.com"
+
+# BROKER_ADDRESS = "broker.hivemq.com"
+BROKER_ADDRESS = '176.230.144.87'
+USERNAME = 'dvirheller'
+PASSWORD = 'Dvir6375831'
 TOPIC = "DvirH/Light/RGB"
 
 KEEP_ALIVE_TOPIC = "DvirH/keepAlive/RGB"
@@ -11,13 +15,15 @@ ID_SENSOR = "RGB_1"
 if __name__ == "__main__":
     # Create an instance of SensorClient
     client = SensorClient(ID_SENSOR, BROKER_ADDRESS, TOPIC,
-                          KEEP_ALIVE_TOPIC, KEEP_ALIVE_SLEEP)
+                          KEEP_ALIVE_TOPIC, KEEP_ALIVE_SLEEP, USERNAME, PASSWORD)
 
     try:
         # Connect to the MQTT broker
         client.connect()
         # Simulate the sensor
         client.simulate_rgb_sensor()
+
     except KeyboardInterrupt:
         # Handle keyboard interrupt to gracefully disconnect
         client.disconnect()
+

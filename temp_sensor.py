@@ -1,6 +1,9 @@
 from sensor_class import SensorClient
 
-BROKER_ADDRESS = "broker.hivemq.com"
+# BROKER_ADDRESS = "broker.hivemq.com"
+BROKER_ADDRESS = '176.230.144.87'
+USERNAME = 'dvirheller'
+PASSWORD = 'Dvir6375831'
 TOPIC = "DvirH/Temperature/DH-11_Temperature"
 
 CHECK_TEMP_SEND = 3
@@ -14,14 +17,16 @@ ID_SENSOR = "temperature_1"
 
 if __name__ == "__main__":
     # Create an instance of SensorClient
-    client = SensorClient(ID_SENSOR, BROKER_ADDRESS, TOPIC, KEEP_ALIVE_TOPIC, KEEP_ALIVE_SLEEP)
-
-    # Connect to the MQTT broker
-    client.connect()
+    client = SensorClient(ID_SENSOR, BROKER_ADDRESS, TOPIC, KEEP_ALIVE_TOPIC, KEEP_ALIVE_SLEEP, USERNAME, PASSWORD)
 
     try:
+        # Connect to the MQTT broker
+        client.connect()
+
         # Simulate the sensor
         client.simulate_temperature_sensor(MIN_TEMP, MAX_TEMP, CHECK_TEMP_SEND)
+
     except KeyboardInterrupt:
         # Handle keyboard interrupt to gracefully disconnect
         client.disconnect()
+

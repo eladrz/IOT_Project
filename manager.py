@@ -7,7 +7,7 @@ from icecream import ic
 # Callback functions
 def on_connect(client, userdata, flags, rc):
     print(f"Connected with result code {str(rc)}")
-    client.subscribe(topic)
+    client.subscribe(TOPIC)
 
 
 def on_message(client, userdata, message):
@@ -57,7 +57,7 @@ def on_message(client, userdata, message):
     sqlMethodes.update_db(device, status, value)
 
 
-def on_disconnect(userdata, rc):
+def on_disconnect(client, userdata, rc):
     if rc != 0:
         print("Unexpected disconnection.")
 
@@ -70,8 +70,11 @@ def turn_on_AC():
 
 if __name__ == "__main__":
     # MQTT settings
-    broker_address = "broker.hivemq.com"
-    topic = "DvirH/#"
+    # BROKER_ADDRESS = "broker.hivemq.com"
+    BROKER_ADDRESS = '176.230.144.87'
+    USERNAME = 'dvirheller'
+    PASSWORD = 'Dvir6375831'
+    TOPIC = "DvirH/#"
     # topic = "DvirH/keepAlive/#"
 
     # Create an MQTT client
@@ -81,8 +84,16 @@ if __name__ == "__main__":
     client.on_message = on_message
     client.on_disconnect = on_disconnect
 
-    # Connect to the MQTT broker
-    client.connect(broker_address, 1883, 60)
+    # Set username and password
+    client.username_pw_set(USERNAME, PASSWORD)
 
-    # Start the MQTT client loop
-    client.loop_forever()
+    try:
+        # Connect to the MQTT broker
+        client.connect(BROKER_ADDRESS, 1883, 60)
+        # Start the MQTT client loop
+        client.loop_forever()
+    except Exception as e:
+        print(f"Error connecting to broker: {e}")
+    except KeyboardInterrupt:
+        # Handle keyboard interrupt to gracefully disconnect
+        client.disconnect()
