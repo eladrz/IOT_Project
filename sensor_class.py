@@ -3,8 +3,7 @@ import random
 import paho.mqtt.client as mqtt
 import threading
 from icecream import ic
-# import tkinter as tk
-# from lamp_class import RGBLamp
+
 
 class SensorClient:
     def __init__(self, client_id, broker_address, topic, alive_topic, keep_alive_interval, username=None, password=None):

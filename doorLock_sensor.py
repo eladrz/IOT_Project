@@ -1,6 +1,5 @@
 from sensor_class import SensorClient
 
-# BROKER_ADDRESS = "broker.hivemq.com"
 BROKER_ADDRESS = 'publicI_P_Address'
 USERNAME = 'dvirheller'
 PASSWORD = 'Dvir6375831'
