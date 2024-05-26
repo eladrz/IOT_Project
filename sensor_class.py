@@ -2,9 +2,7 @@ import time
 import random
 import paho.mqtt.client as mqtt
 import threading
-#import tkinter as tk
-#from lamp_class import RGBLamp
-from sqlclass import IoTDatabase
+
 
 TOPIC_MANAGER = "manager"
 
@@ -20,7 +18,6 @@ class SensorClient:
         self.alive_topic = alive_topic
         self.keep_alive_interval = keep_alive_interval
         self.source = None
-        self.db = IoTDatabase()
         # self.lamp = None
 
     def connect(self):
@@ -34,21 +31,6 @@ class SensorClient:
     def on_message(self, client, userdata, msg):
         payload = msg.payload.decode('utf-8')
         manager_msg =  self.source + "/" + self.client_id + "/" + payload
-       # if self.source == "rgb":
-           # if payload == "on":
-              #  self.db.update_data(int(self.client_id),status="on")
-             #   print("RGB on")
-            #elif payload == "off":
-            #    self.db.update_data(int(self.client_id),status="off")
-           #     print("RGB off")
-          #  else:
-          #      print(msg.topic + ": received RGB data:", payload)
-         #       self.db.update_data(int(self.client_id),value=payload)
-            # self.lamp.get_color(rgb_data)
-            
-        #elif self.source == "temp":
-        #    self.db.update_data(int(self.client_id),value=payload)
-       #     print(msg.topic + ": " + payload)
 
     def keepAlive(self):
         while True:
@@ -57,7 +39,6 @@ class SensorClient:
             massage = self.client_id + ": " + \
                       str(uptime_seconds) + " seconds alive"
             self.client.publish(self.alive_topic, massage)
-            #self.db.update_data(int(self.client_id),keepAlive=str(uptime_seconds) + " sec")
             manager_msg =  "keepalive"+ "/" + self.client_id + "/" + str(uptime_seconds) + " sec"
             self.client.publish(TOPIC_MANAGER, manager_msg )
             # Sleep for the keep-alive interval
@@ -89,10 +70,10 @@ class SensorClient:
         self.source = "rgb"
         alive_thread = threading.Thread(target=self.keepAlive)
         alive_thread.start()
-        # root = tk.Tk()
-        # self.lamp = RGBLamp(root)
-        # root.mainloop()
         alive_thread.join()
+        
+ 
+        
 
     def disconnect(self):
         self.client.loop_stop()

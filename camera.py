@@ -1,12 +1,10 @@
 from sensor_class import SensorClient
 #from sqlclass import IoTDatabase
 
-#BROKER_ADDRESS = "broker.hivemq.com"
-#TOPIC = "DvirH/Light/RGB"
 
 KEEP_ALIVE_TOPIC = "keepalive"
 KEEP_ALIVE_SLEEP = 2
-TOPIC = "sensors/RGB"
+TOPIC = "sensors/camera"
 BROKER_ADDRESS = "localhost"
 ID_SENSOR = "1"
 
@@ -15,10 +13,7 @@ if __name__ == "__main__":
     client = SensorClient(ID_SENSOR, BROKER_ADDRESS, TOPIC,
                           KEEP_ALIVE_TOPIC, KEEP_ALIVE_SLEEP)
     	
-    #rgb_db = IoTDatabase()
-    #rgb_db.init_db()
-    #rgb_db.create_IOT_dev(int(ID_SENSOR),"RGB", "#000000", " ", "room1", " ", "sensors/RGB")
-    #rgb_db.print_database()
+
     try:
         # Connect to the MQTT broker
         client.connect()
