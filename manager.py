@@ -34,7 +34,18 @@ def IsTempSensor(msg_split):
 			db.update_data(int(msg_split[1]),status="on")
 		return True
 	else:
-		return False		
+		return False
+
+def IshumiditySensor(msg_split):
+	if "humidity" in msg_split[0]:
+		if msg_split[2] == "on" or msg_split[2] == "off":
+			db.update_data(int(msg_split[1]),status=msg_split[2])
+		else:
+			db.update_data(int(msg_split[1]),value=msg_split[2])
+			db.update_data(int(msg_split[1]),status="on")
+		return True
+	else:
+		return False
 
 def IsDoorLockSensor(msg_split):
 	if "DoorLock" in msg_split[0]:
@@ -67,6 +78,7 @@ def on_message_received(client, userdata, message):
     IsTempSensor(msg_split)
     IsDoorLockSensor(msg_split)
     IsWaterLevelSensor(msg_split)
+    IshumiditySensor(msg_split)
     
     
     

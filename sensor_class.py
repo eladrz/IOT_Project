@@ -83,6 +83,8 @@ class SensorClient:
                 # Simulating humidity data
                 humidity = random.randint(min_temp, max_temp)
                 self.client.publish(self.topic, str(humidity))
+                manager_msg =  self.source + "/" + self.client_id + "/" + str(humidity)
+                self.client.publish(TOPIC_MANAGER, manager_msg)
                 time.sleep(sleep)  # Simulate sensor update interval
             # alive_thread.join()
         except Exception as e:
@@ -111,15 +113,17 @@ class SensorClient:
 
     def simulate_waterLevel_sensor(self, min_temp, max_temp, sleep):
         try:
-            self.source = "water"
+            self.source = "waterLevel"
             alive_thread = threading.Thread(target=self.keepAlive)
             alive_thread.start()
             while True:
                 # Simulating water data
                 water = random.randint(min_temp, max_temp)
                 self.client.publish(self.topic, str(water))
+                manager_msg =  self.source + "/" + self.client_id + "/" + str(water)
+                self.client.publish(TOPIC_MANAGER, manager_msg)
                 time.sleep(sleep)  # Simulate sensor update interval
-            # alive_thread.join()
+            alive_thread.join()
         except Exception as e:
             print(f"Error in water level simulation: {e}")
 
