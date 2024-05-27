@@ -1,18 +1,17 @@
 from sensor_class import SensorClient
 
 BROKER_ADDRESS = 'publicI_P_Address'
-USERNAME = 'dvirheller'
-PASSWORD = 'Dvir6375831'
-TOPIC = "DvirH/WaterLevel"
 
 CHECK_WATER_SEND = 3
 MIN_WATER = 0
 MAX_WATER = 500
-KEEP_ALIVE_TOPIC = "DvirH/keepAlive/WaterLevel"
+KEEP_ALIVE_TOPIC = "sensors/WaterLevel"
 KEEP_ALIVE_SLEEP = 2
 # TOPIC = "sensors/WaterLevel"
 # BROKER_ADDRESS = "localhost"
-ID_SENSOR = "WaterLevel_1"
+ID_SENSOR = "4"
+USERNAME = 'dvirheller'
+PASSWORD = 'Dvir6375831'
 
 if __name__ == "__main__":
     # Create an instance of SensorClient
@@ -20,6 +19,10 @@ if __name__ == "__main__":
 
     # Connect to the MQTT broker
     client.connect()
+    db = IoTDatabase()
+    db.init_db()
+    db.create_IOT_dev(int(ID_SENSOR),"WaterLevel", "", "", "room2", dev_pub_topic = "sensors/WaterLevel", dev_sub_topic ="")
+    db.print_database()
 
     try:
         # Simulate the sensor

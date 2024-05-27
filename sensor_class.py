@@ -2,8 +2,8 @@ import time
 import random
 import paho.mqtt.client as mqtt
 import threading
-from icecream import ic
 
+TOPIC_MANAGER = "manager"
 
 class SensorClient:
     def __init__(self, client_id, broker_address, topic, alive_topic, keep_alive_interval, username=None, password=None):
@@ -38,43 +38,26 @@ class SensorClient:
             print(f"Error subscribing to topic: {e}")
 
     def on_message(self, client, userdata, msg):
-        try:
-            if self.source == "RGB":
-                payload = msg.payload.decode('utf-8')
-                if payload == "on":
-                    print("RGB on")
-                elif payload == "off":
-                    print("RGB off")
-                else:
-                    rgb_values = payload.split("(")[1].split(")")[0]
-                    print(f"RGB value:({rgb_values})")
-            elif self.source == "DoorLock":
-                payload = msg.payload.decode('utf-8')
-                if payload == 'on':
-                    print(f"The door is locked")
-                else:
-                    print(f"The door is unlocked")
-
-            elif self.source == "temp":
-                print(msg.topic + ": " + str(msg.payload))
-            elif self.source == "humidity":
-                print(msg.topic + ": " + str(msg.payload))
-            elif self.source == "water":
-                print(msg.topic + ": " + str(msg.payload))
-        except Exception as e:
-            print(f"Error processing message: {e}")
+        payload = msg.payload.decode('utf-8')
+        manager_msg =  self.source + "/" + self.client_id + "/" + payload
+        self.client.publish(TOPIC_MANAGER, manager_msg)
+            
+            
     def keepAlive(self):
         try:
             while True:
                 current_time = time.time()
                 uptime_seconds = int(current_time - self.start_time)
-                message = self.client_id + ": " + \
-                          str(uptime_seconds) + " seconds alive"
-                self.client.publish(self.alive_topic, message)
+                massage = self.client_id + ": " + \
+                str(uptime_seconds) + " seconds alive"
+                self.client.publish(self.alive_topic, massage)
+                manager_msg =  "keepalive"+ "/" + self.client_id + "/" + str(uptime_seconds) + " sec"
+                self.client.publish(TOPIC_MANAGER, manager_msg )
                 # Sleep for the keep-alive interval
                 time.sleep(self.keep_alive_interval)
         except Exception as e:
             print(f"Error in keepAlive thread: {e}")
+            
     def simulate_temperature_sensor(self, min_temp, max_temp, sleep):
         try:
             self.source = "temp"
@@ -83,11 +66,14 @@ class SensorClient:
             while True:
                 # Simulating temperature data
                 temperature = random.randint(min_temp, max_temp)
-                self.client.publish(self.topic, str(temperature))
+                self.client.publish(self.topic, str(round(temperature, 2)))
+                manager_msg =  self.source + "/" + self.client_id + "/" + str(round(temperature, 2))
+                self.client.publish(TOPIC_MANAGER, manager_msg)
                 time.sleep(sleep)  # Simulate sensor update interval
-            # alive_thread.join()
+            alive_thread.join()
         except Exception as e:
             print(f"Error in temperature simulation: {e}")
+            
     def simulate_humidity_sensor(self, min_temp, max_temp, sleep):
         try:
             self.source = "humidity"
@@ -110,7 +96,7 @@ class SensorClient:
             # root = tk.Tk()
             # self.lamp = RGBLamp(root)
             # root.mainloop()
-            # alive_thread.join()
+            alive_thread.join()
         except Exception as e:
             print(f"Error in RGB simulation: {e}")
 
@@ -119,7 +105,7 @@ class SensorClient:
             self.source = "DoorLock"
             alive_thread = threading.Thread(target=self.keepAlive)
             alive_thread.start()
-            # alive_thread.join()
+            alive_thread.join()
         except Exception as e:
             print(f"Error in door lock simulation: {e}")
 
