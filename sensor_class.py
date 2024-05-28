@@ -40,11 +40,13 @@ class SensorClient:
 
     def on_message(self, client, userdata, msg):
         payload = msg.payload.decode('utf-8')
-        print(payload)
         manager_msg =  self.source + "/" + self.client_id + "/" + payload
         self.client.publish(TOPIC_MANAGER, manager_msg)
+        # handle the simulation
         if self.source == "RGB":
             change_color(payload)
+        elif self.source == "DoorLock":
+        	check_signal(payload)
             
             
     def keepAlive(self):
@@ -109,6 +111,7 @@ class SensorClient:
             self.source = "DoorLock"
             alive_thread = threading.Thread(target=self.keepAlive)
             alive_thread.start()
+            DoorLock_Simulation() # simulation of door lock
             alive_thread.join()
         except Exception as e:
             print(f"Error in door lock simulation: {e}")

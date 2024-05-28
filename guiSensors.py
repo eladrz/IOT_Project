@@ -1,5 +1,5 @@
 import tkinter as tk
-
+import time
 def update_color(*args):
     red_val = red_slider.get()
     green_val = green_slider.get()
@@ -54,6 +54,72 @@ def create_RGB_led():
 
     off_button = tk.Button(root, text="Turn Off", command=turn_off, width=10, height=2)
     off_button.pack(side=tk.RIGHT, padx=10)
+
+    # Run the GUI
+    root.mainloop()
+
+##################################################
+
+def update_screen(value):
+    current_text = screen_label.cget("text")
+    screen_label.config(text=current_text + value)
+
+def clear_screen():
+    screen_label.config(text="")
+
+def check_password():
+    entered_password = screen_label.cget("text")
+    if entered_password == "1234*":
+        screen_label.config(text="Door open")
+    else:
+        screen_label.config(text="Not correct")
+
+def check_signal(data):
+    if data == "1":
+        screen_label.config(text="Door open")
+    else:
+        screen_label.config(text="Door close")
+
+def DoorLock_Simulation():
+    # Define the matrix of numbers
+    number_matrix = [
+        ["1", "2", "3"],
+        ["4", "5", "6"],
+        ["7", "8", "9"],
+        ["*", "0", "#"]
+    ]
+
+    # Create the main window
+    root = tk.Tk()
+    root.title("Number Matrix")
+
+    # Create a frame to hold the screen
+    screen_frame = tk.Frame(root)
+    screen_frame.pack(pady=10)
+
+    # Create the screen label as a global variable
+    global screen_label
+    screen_label = tk.Label(screen_frame, text="", font=("Arial", 20), width=15, height=2, bg="white", relief="solid", borderwidth=1)
+    screen_label.pack()
+
+    # Create a frame to hold the matrix
+    matrix_frame = tk.Frame(root)
+    matrix_frame.pack()
+
+    # Create labels for each element in the matrix
+    for row_idx, row in enumerate(number_matrix):
+        for col_idx, value in enumerate(row):
+            label = tk.Button(matrix_frame, text=value, font=("Arial", 20), width=5, height=2, relief="solid", borderwidth=1,
+                            command=lambda val=value: update_screen(val))
+            label.grid(row=row_idx, column=col_idx, padx=5, pady=5)
+
+    # Create an "Enter" button
+    enter_button = tk.Button(root, text="Enter", font=("Arial", 16), width=10, command=check_password)
+    enter_button.pack(pady=5)
+
+    # Create a "Clear" button
+    clear_button = tk.Button(root, text="Clear", font=("Arial", 16), width=10, command=clear_screen)
+    clear_button.pack(pady=5)
 
     # Run the GUI
     root.mainloop()
