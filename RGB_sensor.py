@@ -8,8 +8,8 @@ TOPIC = "sensors/RGB"
 BROKER_ADDRESS = "localhost"
 ID_SENSOR = "1"
 
-USERNAME = 'dvirheller'
-PASSWORD = 'Dvir6375831'
+USERNAME = 'username'
+PASSWORD = 'password'
 
 if __name__ == "__main__":
     # Create an instance of SensorClient

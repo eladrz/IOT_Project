@@ -154,8 +154,6 @@ class IoTDatabase:
             print("Error! Database connection is not established.")
 
 
-
-# Example usage:
 if __name__ == '__main__':
     db = IoTDatabase()
     db.init_db()

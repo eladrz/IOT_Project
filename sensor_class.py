@@ -2,6 +2,8 @@ import time
 import random
 import paho.mqtt.client as mqtt
 import threading
+import tkinter as tk
+from guiSensors import *
 
 TOPIC_MANAGER = "manager"
 
@@ -19,7 +21,6 @@ class SensorClient:
         self.alive_topic = alive_topic
         self.keep_alive_interval = keep_alive_interval
         self.source = None  # Initialize source variable
-        # self.lamp = None
 
     def connect(self):
         try:
@@ -39,8 +40,11 @@ class SensorClient:
 
     def on_message(self, client, userdata, msg):
         payload = msg.payload.decode('utf-8')
+        print(payload)
         manager_msg =  self.source + "/" + self.client_id + "/" + payload
         self.client.publish(TOPIC_MANAGER, manager_msg)
+        if self.source == "RGB":
+            change_color(payload)
             
             
     def keepAlive(self):
@@ -95,9 +99,7 @@ class SensorClient:
             self.source = "RGB"
             alive_thread = threading.Thread(target=self.keepAlive)
             alive_thread.start()
-            # root = tk.Tk()
-            # self.lamp = RGBLamp(root)
-            # root.mainloop()
+            create_RGB_led() # create the simulation
             alive_thread.join()
         except Exception as e:
             print(f"Error in RGB simulation: {e}")

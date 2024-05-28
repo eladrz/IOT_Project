@@ -4,8 +4,8 @@ from sqlclass import IoTDatabase
 TOPIC = "manager"
 BROKER_ADDRESS = "localhost"
 BROKER_PORT = 1883
-USERNAME = 'dvirheller'
-PASSWORD = 'Dvir6375831'
+USERNAME = 'username'
+PASSWORD = 'password'
 
 # functin: update_data(self, sys_id, name, status, keepAlive, value)
 def IsKeepAlive(msg_split):
@@ -49,10 +49,7 @@ def IshumiditySensor(msg_split):
 
 def IsDoorLockSensor(msg_split):
 	if "DoorLock" in msg_split[0]:
-		if msg_split[2] == "on" or msg_split[2] == "off":
-			db.update_data(int(msg_split[1]),status=msg_split[2])
-		else:
-			db.update_data(int(msg_split[1]),value=msg_split[2])
+		db.update_data(int(msg_split[1]),value=msg_split[2])
 		return True
 	else:
 		return False
