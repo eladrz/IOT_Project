@@ -2,10 +2,10 @@ import paho.mqtt.client as mqtt
 from sqlclass import IoTDatabase
 
 # TOPIC = "manager"
-BROKER_ADDRESS = "192.168.0.212"
+BROKER_ADDRESS = "localhost"
 BROKER_PORT = 1883
-USERNAME = 'dvirheller'
-PASSWORD = 'Dvir6375831'
+USERNAME = 'username'
+PASSWORD = 'password'
 
 
 # functin: update_data(self, sys_id, name, status, keepAlive, value)
