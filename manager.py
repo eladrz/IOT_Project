@@ -1,98 +1,110 @@
 import paho.mqtt.client as mqtt
-import random
-import sqlMethodes
-from icecream import ic
+from sqlclass import IoTDatabase
 
+TOPIC = "manager"
+BROKER_ADDRESS = "localhost"
+BROKER_PORT = 1883
+USERNAME = 'username'
+PASSWORD = 'password'
 
-# Callback functions
-def on_connect(client, userdata, flags, rc):
-    print(f"Connected with result code {str(rc)}")
-    client.subscribe(TOPIC)
+# functin: update_data(self, sys_id, name, status, keepAlive, value)
+def IsKeepAlive(msg_split):
+	if "keepalive" in msg_split[0]:
+		db.update_data(int(msg_split[1]),keepAlive=msg_split[2])
+		return True
+	else:
+		return False
 
+def IsRGBSensor(msg_split):
+	if "rgb" in msg_split[0]:
+		if msg_split[2] == "on" or msg_split[2] == "off":
+			db.update_data(int(msg_split[1]),status=msg_split[2])
+		else:
+			db.update_data(int(msg_split[1]),value=msg_split[2])
+		return True
+	else:
+		return False
+		
+def IsTempSensor(msg_split):
+	if "temp" in msg_split[0]:
+		if msg_split[2] == "on" or msg_split[2] == "off":
+			db.update_data(int(msg_split[1]),status=msg_split[2])
+		else:
+			db.update_data(int(msg_split[1]),value=msg_split[2])
+			db.update_data(int(msg_split[1]),status="on")
+		return True
+	else:
+		return False
 
-def on_message(client, userdata, message):
-    topic = message.topic
-    device = topic.split("/")[-1]
-    if 'keepAlive' in topic:
-        KAmsg = message.payload.decode("utf-8")
-        parseKAmsg = KAmsg.split(":")
-        uptime_seconds = parseKAmsg[1].strip()
-        sqlMethodes.update_keepAlive(device, uptime_seconds)
-        return
-    value_or_status = message.payload.decode("utf-8")
-    # Extract relevant information from the message
-    if value_or_status == 'on':
-        status = "on"
-        value = sqlMethodes.get_device_value(device)
-        print(f"{device} turned on")
-    elif value_or_status == 'off':
-        status = "off"
-        value = sqlMethodes.get_device_value(device)
-        print(f"{device} turned off")
-    else:
-        value = value_or_status
-        if "rgb" in value:
-            value = value.split("(")[1].split(")")[0]
-            print(f"RGB set to: ({value})")
-        elif device == 'Airconditioner':
-            print(f"AC set to {value}º")
-        elif device == 'WaterLevel':
-            print(f"The water level is {value}mm")
-            sqlMethodes.update_db(device, 'on', value)
-            return
-        elif device == 'DH-11_Humidity':
-            print(f"Humidity in the room is: {value}%")
-            sqlMethodes.update_db(device, 'on', value)
-            return
-        elif device == 'DH-11_Temperature':
-            print(f"Temp in the room is: {value}º")
-            sqlMethodes.update_db(device, 'on', value)
-            if int(value) > 28:
-                turn_on_AC()
-            return
+def IshumiditySensor(msg_split):
+	if "humidity" in msg_split[0]:
+		if msg_split[2] == "on" or msg_split[2] == "off":
+			db.update_data(int(msg_split[1]),status=msg_split[2])
+		else:
+			db.update_data(int(msg_split[1]),value=msg_split[2])
+			db.update_data(int(msg_split[1]),status="on")
+		return True
+	else:
+		return False
 
-        status = sqlMethodes.get_device_status(device)
+def IsDoorLockSensor(msg_split):
+	if "DoorLock" in msg_split[0]:
+		db.update_data(int(msg_split[1]),value=msg_split[2])
+		return True
+	else:
+		return False
+		
+def IsWaterLevelSensor(msg_split):
+	if "waterLevel" in msg_split[0]:
+		if msg_split[2] == "on" or msg_split[2] == "off":
+			db.update_data(int(msg_split[1]),status=msg_split[2])
+		else:
+			db.update_data(int(msg_split[1]),value=msg_split[2])
+		return True
+	else:
+		return False
 
-    # Update the database
-    sqlMethodes.update_db(device, status, value)
-
-
-def on_disconnect(client, userdata, rc):
-    if rc != 0:
-        print("Unexpected disconnection.")
-
-
-def turn_on_AC():
-    sqlMethodes.update_db('Airconditioner', 'on', sqlMethodes.get_device_value('Airconditioner'))
-    # client.publish("DvirH/Airconditioner", "on") ToDo check/make it work
-    print("A/C turned on")
-
-
+# Define a callback function to handle incoming messages
+def on_message_received(client, userdata, message):
+    #print(f"Received message on topic '{message.topic}': {message.payload.decode()}")
+    msg = message.payload.decode('utf-8')
+    # the 0 check the name of the sensor, 1 - the ID, 2 - the msg
+    msg_split = msg.split('/')
+    IsKeepAlive(msg_split)
+    IsRGBSensor(msg_split)
+    IsTempSensor(msg_split)
+    IsDoorLockSensor(msg_split)
+    IsWaterLevelSensor(msg_split)
+    IshumiditySensor(msg_split)
+    
+    
+    
 if __name__ == "__main__":
-    # MQTT settings
-    BROKER_ADDRESS = 'publicI_P_Address'
-    USERNAME = 'dvirheller'
-    PASSWORD = 'Dvir6375831'
-    TOPIC = "DvirH/#"
-    # topic = "DvirH/keepAlive/#"
-
-    # Create an MQTT client
-    client_id = f'python-mqtt-{random.randint(0, 1000)}'
-    client = mqtt.Client(client_id)
-    client.on_connect = on_connect
-    client.on_message = on_message
-    client.on_disconnect = on_disconnect
+    # Initialize the MQTT client
+    mqtt_client = mqtt.Client()
 
     # Set username and password
-    client.username_pw_set(USERNAME, PASSWORD)
+    mqtt_client.username_pw_set(username=USERNAME, password=PASSWORD)
+
+    # Set up callback functions
+    mqtt_client.on_message = on_message_received
+
+    # Connect to the MQTT broker
+    mqtt_client.connect(BROKER_ADDRESS, port=BROKER_PORT)
+    mqtt_client.subscribe(TOPIC)
+    
+    #connect to the data base
+    db = IoTDatabase()
+    db.init_db()
+
+    # Start the MQTT client loop to handle incoming messages
+    mqtt_client.loop_start()
 
     try:
-        # Connect to the MQTT broker
-        client.connect(BROKER_ADDRESS, 1883, 60)
-        # Start the MQTT client loop
-        client.loop_forever()
-    except Exception as e:
-        print(f"Error connecting to broker: {e}")
+        while True:
+            pass
     except KeyboardInterrupt:
-        # Handle keyboard interrupt to gracefully disconnect
-        client.disconnect()
+        # Disconnect from the broker when Ctrl+C is pressed
+        mqtt_client.disconnect()
+
+

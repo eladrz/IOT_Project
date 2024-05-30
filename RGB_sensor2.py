@@ -1,8 +1,6 @@
 from sensor_class import SensorClient
 #from sqlclass import IoTDatabase
 
-#BROKER_ADDRESS = "broker.hivemq.com"
-#TOPIC = "DvirH/Light/RGB"
 
 KEEP_ALIVE_TOPIC = "keepalive"
 KEEP_ALIVE_SLEEP = 2
@@ -10,10 +8,13 @@ TOPIC = "sensors/RGB"
 BROKER_ADDRESS = "localhost"
 ID_SENSOR = "1"
 
+USERNAME = 'username'
+PASSWORD = 'password'
+
 if __name__ == "__main__":
     # Create an instance of SensorClient
     client = SensorClient(ID_SENSOR, BROKER_ADDRESS, TOPIC,
-                          KEEP_ALIVE_TOPIC, KEEP_ALIVE_SLEEP)
+                          KEEP_ALIVE_TOPIC, KEEP_ALIVE_SLEEP, USERNAME, PASSWORD)
     	
     #rgb_db = IoTDatabase()
     #rgb_db.init_db()

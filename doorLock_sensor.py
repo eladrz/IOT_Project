@@ -1,16 +1,17 @@
 from sensor_class import SensorClient
+#from sqlclass import IoTDatabase
 
-BROKER_ADDRESS = 'publicI_P_Address'
-USERNAME = 'dvirheller'
-PASSWORD = 'Dvir6375831'
-TOPIC = "DvirH/DoorLock"
+#BROKER_ADDRESS = 'publicI_P_Address'
 
 CHECK_DoorLock_SEND = 3
-KEEP_ALIVE_TOPIC = "DvirH/keepAlive/DoorLock"
+KEEP_ALIVE_TOPIC = "keepalive"
 KEEP_ALIVE_SLEEP = 2
-# TOPIC = "sensors/humidity"
-# BROKER_ADDRESS = "localhost"
-ID_SENSOR = "doorLock_1"
+TOPIC = "sensors/DoorLock"
+BROKER_ADDRESS = "localhost"
+ID_SENSOR = "3"
+
+USERNAME = 'username'
+PASSWORD = 'password'
 
 if __name__ == "__main__":
     # Create an instance of SensorClient
@@ -18,7 +19,10 @@ if __name__ == "__main__":
 
     # Connect to the MQTT broker
     client.connect()
-
+    #db = IoTDatabase()
+    #db.init_db()
+    #db.create_IOT_dev(int(ID_SENSOR),"DoorLock", "", "", "room1", dev_pub_topic = "", dev_sub_topic = "sensors/DoorLock")
+    #db.print_database()
     try:
         # Simulate the sensor
         client.simulate_doorLock_sensor()
