@@ -1,27 +1,34 @@
 import tkinter as tk
 import time
+
+
 def update_color(*args):
     red_val = red_slider.get()
     green_val = green_slider.get()
     blue_val = blue_slider.get()
     status_label.config(bg=f"#{red_val:02x}{green_val:02x}{blue_val:02x}")
-    
+    return red_val, green_val, blue_val
+
+
 def change_color(data):
-	turn_on()
-	status_label.config(bg=data)
+    turn_on()
+    status_label.config(bg=data)
+
 
 def turn_on():
-    update_color()
-    status_label.config(text="The led is now turned on.", bg="white")
+    red_val, green_val, blue_val = update_color()
+    status_label.config(text="The led is now turned on.", fg="black", bg=f"#{red_val:02x}{green_val:02x}{blue_val:02x}")
     red_slider.config(state=tk.NORMAL)
     green_slider.config(state=tk.NORMAL)
     blue_slider.config(state=tk.NORMAL)
 
+
 def turn_off():
-    status_label.config(text="The led is now turned off.", bg="black")
+    status_label.config(text="The led is now turned off.", fg="white", bg="black")
     red_slider.config(state=tk.DISABLED)
     green_slider.config(state=tk.DISABLED)
     blue_slider.config(state=tk.DISABLED)
+
 
 def create_RGB_led():
     # Create the main window
@@ -40,7 +47,8 @@ def create_RGB_led():
     red_slider.set(0)
     red_slider.pack()
 
-    green_slider = tk.Scale(root, from_=0, to=255, label="Green", orient=tk.HORIZONTAL, length=200, command=update_color)
+    green_slider = tk.Scale(root, from_=0, to=255, label="Green", orient=tk.HORIZONTAL, length=200,
+                            command=update_color)
     green_slider.set(0)
     green_slider.pack()
 
@@ -58,14 +66,17 @@ def create_RGB_led():
     # Run the GUI
     root.mainloop()
 
+
 ##################################################
 
 def update_screen(value):
     current_text = screen_label.cget("text")
     screen_label.config(text=current_text + value)
 
+
 def clear_screen():
     screen_label.config(text="")
+
 
 def check_password():
     entered_password = screen_label.cget("text")
@@ -74,11 +85,13 @@ def check_password():
     else:
         screen_label.config(text="Not correct")
 
+
 def check_signal(data):
     if data == "1":
         screen_label.config(text="Door open")
     else:
         screen_label.config(text="Door close")
+
 
 def DoorLock_Simulation():
     # Define the matrix of numbers
@@ -99,7 +112,8 @@ def DoorLock_Simulation():
 
     # Create the screen label as a global variable
     global screen_label
-    screen_label = tk.Label(screen_frame, text="", font=("Arial", 20), width=15, height=2, bg="white", relief="solid", borderwidth=1)
+    screen_label = tk.Label(screen_frame, text="", font=("Arial", 20), width=15, height=2, bg="white", relief="solid",
+                            borderwidth=1)
     screen_label.pack()
 
     # Create a frame to hold the matrix
@@ -109,8 +123,9 @@ def DoorLock_Simulation():
     # Create labels for each element in the matrix
     for row_idx, row in enumerate(number_matrix):
         for col_idx, value in enumerate(row):
-            label = tk.Button(matrix_frame, text=value, font=("Arial", 20), width=5, height=2, relief="solid", borderwidth=1,
-                            command=lambda val=value: update_screen(val))
+            label = tk.Button(matrix_frame, text=value, font=("Arial", 20), width=5, height=2, relief="solid",
+                              borderwidth=1,
+                              command=lambda val=value: update_screen(val))
             label.grid(row=row_idx, column=col_idx, padx=5, pady=5)
 
     # Create an "Enter" button
@@ -123,4 +138,3 @@ def DoorLock_Simulation():
 
     # Run the GUI
     root.mainloop()
-

@@ -103,6 +103,7 @@ class IoTDatabase:
             except sqlite3.Error as e:
                 print(e)
             finally:
+                print(f"db updated for sys_id: {sys_id}")
                 conn.close()
         else:
             print("Error! Cannot create the database connection.")
