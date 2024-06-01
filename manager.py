@@ -22,7 +22,7 @@ def IsKeepAlive(msg_split,topic):
 
 def IsRGBSensor(msg_split,topic):
     try:
-        if "rgb" in topic:
+        if "RGB" in topic:
             if msg_split[1] == "on" or msg_split[1] == "off":
                 db.update_data(int(msg_split[0]), status=msg_split[1])
             else:
@@ -36,7 +36,7 @@ def IsRGBSensor(msg_split,topic):
 
 def IsTempSensor(msg_split,topic):
     try:
-        if "temp" in topic:
+        if "Temperature" in topic:
             if msg_split[1] == "on" or msg_split[1] == "off":
                 db.update_data(int(msg_split[0]), status=msg_split[1])
             else:
@@ -51,7 +51,7 @@ def IsTempSensor(msg_split,topic):
 
 def IsHumiditySensor(msg_split,topic):
     try:
-        if "humidity" in topic:
+        if "Humidity" in topic:
             if msg_split[1] == "on" or msg_split[1] == "off":
                 db.update_data(int(msg_split[0]), status=msg_split[1])
             else:
@@ -77,11 +77,12 @@ def IsDoorLockSensor(msg_split,topic):
 
 def IsWaterLevelSensor(msg_split,topic):
     try:
-        if "waterLevel" in topic:
+        if 'WaterLevel' in topic:
             if msg_split[1] == "on" or msg_split[1] == "off":
                 db.update_data(int(msg_split[0]), status=msg_split[1])
             else:
                 db.update_data(int(msg_split[0]), value=msg_split[1])
+                db.update_data(int(msg_split[0]), status="on")
             return True
         else:
             return False

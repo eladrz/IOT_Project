@@ -6,7 +6,7 @@ from sensor_class import SensorClient
 CHECK_DoorLock_SEND = 3
 KEEP_ALIVE_TOPIC = "keepalive"
 KEEP_ALIVE_SLEEP = 2
-TOPIC = "sensors/DoorLock"
+TOPIC = "DoorLock"
 BROKER_ADDRESS = "localhost"
 ID_SENSOR = "3"
 
