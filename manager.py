@@ -9,7 +9,7 @@ PASSWORD = 'password'
 
 
 # functin: update_data(self, sys_id, name, status, keepAlive, value)
-def IsKeepAlive(msg_split,topic):
+def IsKeepAlive(msg_split, topic):
     try:
         if "keepalive" in topic:
             db.update_data(int(msg_split[0]), keepAlive=msg_split[1])
@@ -20,7 +20,7 @@ def IsKeepAlive(msg_split,topic):
         print(f"Error in keepAlive: {e}")
 
 
-def IsRGBSensor(msg_split,topic):
+def IsRGBSensor(msg_split, topic):
     try:
         if "RGB" in topic:
             if msg_split[1] == "on" or msg_split[1] == "off":
@@ -34,7 +34,7 @@ def IsRGBSensor(msg_split,topic):
         print(f"Error in RGB: {e}")
 
 
-def IsTempSensor(msg_split,topic):
+def IsTempSensor(msg_split, topic):
     try:
         if "Temperature" in topic:
             if msg_split[1] == "on" or msg_split[1] == "off":
@@ -49,7 +49,7 @@ def IsTempSensor(msg_split,topic):
         print(f"Error in keepAlive thread: {e}")
 
 
-def IsHumiditySensor(msg_split,topic):
+def IsHumiditySensor(msg_split, topic):
     try:
         if "Humidity" in topic:
             if msg_split[1] == "on" or msg_split[1] == "off":
@@ -64,7 +64,7 @@ def IsHumiditySensor(msg_split,topic):
         print(f"Error in keepAlive thread: {e}")
 
 
-def IsDoorLockSensor(msg_split,topic):
+def IsDoorLockSensor(msg_split, topic):
     try:
         if "DoorLock" in topic:
             db.update_data(int(msg_split[0]), value=msg_split[1])
@@ -75,9 +75,24 @@ def IsDoorLockSensor(msg_split,topic):
         print(f"Error in keepAlive thread: {e}")
 
 
-def IsWaterLevelSensor(msg_split,topic):
+def IsWaterLevelSensor(msg_split, topic):
     try:
         if 'WaterLevel' in topic:
+            if msg_split[1] == "on" or msg_split[1] == "off":
+                db.update_data(int(msg_split[0]), status=msg_split[1])
+            else:
+                db.update_data(int(msg_split[0]), value=msg_split[1])
+                db.update_data(int(msg_split[0]), status="on")
+            return True
+        else:
+            return False
+    except Exception as e:
+        print(f"Error in keepAlive thread: {e}")
+
+
+def IsAirconditionerSensor(msg_split, topic):
+    try:
+        if 'Airconditioner' in topic:
             if msg_split[1] == "on" or msg_split[1] == "off":
                 db.update_data(int(msg_split[0]), status=msg_split[1])
             else:
@@ -98,17 +113,19 @@ def on_message_received(client, userdata, message):
     # 0:keepalive or device; 1:ID; 2:msg.
     if len(msg_split) == 2:
         # Check the type of sensor and handle accordingly
-        if IsKeepAlive(msg_split,topic):
+        if IsKeepAlive(msg_split, topic):
             return
-        elif IsRGBSensor(msg_split,topic):
+        elif IsRGBSensor(msg_split, topic):
             return
-        elif IsTempSensor(msg_split,topic):
+        elif IsTempSensor(msg_split, topic):
             return
-        elif IsDoorLockSensor(msg_split,topic):
+        elif IsDoorLockSensor(msg_split, topic):
             return
-        elif IsWaterLevelSensor(msg_split,topic):
+        elif IsWaterLevelSensor(msg_split, topic):
             return
-        elif IsHumiditySensor(msg_split,topic):
+        elif IsHumiditySensor(msg_split, topic):
+            return
+        elif IsAirconditionerSensor(msg_split, topic):
             return
     else:
         print("Wrong message format!")

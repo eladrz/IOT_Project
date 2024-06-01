@@ -1,6 +1,7 @@
 import sqlite3
 from datetime import datetime
 
+
 class IoTDatabase:
     def __init__(self, db_file='iot_sensors.db'):
         self.db_file = db_file
@@ -56,8 +57,8 @@ class IoTDatabase:
 
         for table in tables:
             self.create_table(table)
- 
-    def update_data(self, sys_id, name=None, status=None, keepAlive=None, value = None):
+
+    def update_data(self, sys_id, name=None, status=None, keepAlive=None, value=None):
         conn = self.create_connection()
         if conn is not None:
             try:
@@ -91,7 +92,7 @@ class IoTDatabase:
                         if name is not None:
                             c.execute("UPDATE iot_devices SET name=? WHERE sys_id=?", (name, sys_id))
                             conn.commit()
-                    
+
                     else:
                         if value is not None:
                             c.execute("UPDATE iot_devices SET value=? WHERE sys_id=?", (value, sys_id))
@@ -108,31 +109,30 @@ class IoTDatabase:
         else:
             print("Error! Cannot create the database connection.")
 
-    def create_IOT_dev(self,sys_id, name, value, units, location, dev_pub_topic, dev_sub_topic):
-    
+    def create_IOT_dev(self, sys_id, name, value, units, location, dev_pub_topic, dev_sub_topic):
+
         device = ''' INSERT INTO iot_devices(sys_id, name, value, units, location, dev_pub_topic, dev_sub_topic)
                   VALUES(?,? ,? ,? ,? ,?, ?) '''
-                  
+
         conn = self.create_connection()
         if conn is not None:
             try:
                 cur = conn.cursor()
                 cur.execute(device, (sys_id, name, value, units, location, dev_pub_topic, dev_sub_topic))
                 conn.commit()
-                
+
                 cur.execute("INSERT INTO data (sys_id, name, LastUpdated, status, keepAlive) VALUES (?, ?, ?, ?, ?)",
-                          (sys_id, name, self.timestamp(), "off", 0))
+                            (sys_id, name, self.timestamp(), "off", 0))
                 conn.commit()
-                
-                print("New IoT device added to database")
+
+                print(f"New IoT device added to database: {name}")
             except sqlite3.Error as e:
                 print(e)
             finally:
                 conn.close()
         else:
             print("Error! Cannot create the database connection.")
-            
-   
+
     def print_database(self):
         """ Print all records from the database """
         conn = self.create_connection()
@@ -157,9 +157,11 @@ class IoTDatabase:
 
 if __name__ == '__main__':
     db = IoTDatabase()
-    db.init_db()
+    # db.init_db()
+    # db.create_IOT_dev(1, 'RGB', '(0, 0, 0)', 'RGB', 'Room1', '', 'RGB')
+    # db.create_IOT_dev(2, 'Temperature', 0, 'º', 'Room1', 'Temperature', '')
+    # db.create_IOT_dev(3, 'DoorLock', 0, '', 'Room1', '', 'DoorLock')
+    # db.create_IOT_dev(4, 'WaterLevel', 0, 'mm', 'Room1', 'WaterLevel', '')
+    # db.create_IOT_dev(5, 'Humidity', 0, '%', 'Room1', 'Humidity', '')
+    # db.create_IOT_dev(6, 'Airconditioner', 0, 'º', 'Room1', '', 'Airconditioner')
     db.print_database()
-
-
-
-
