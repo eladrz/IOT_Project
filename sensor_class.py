@@ -4,6 +4,7 @@ import paho.mqtt.client as mqtt
 import threading
 import tkinter as tk
 from guiSensors import *
+import json
 
 
 class SensorClient:
@@ -54,8 +55,13 @@ class SensorClient:
             while True:
                 current_time = time.time()
                 uptime_seconds = int(current_time - self.start_time)
-                msg = self.client_id + "/" + str(uptime_seconds) + " sec"
-                self.client.publish('keepalive', msg)
+                msg = {
+                    'sys_id': self.client_id,
+                    'device': self.topic,
+                    'payload': str(uptime_seconds) + " sec"
+                }
+                json_message = json.dumps(msg)
+                self.client.publish('keepalive', json_message)
                 # Sleep for the keep-alive interval
                 time.sleep(self.keep_alive_interval)
         except Exception as e:
@@ -68,8 +74,12 @@ class SensorClient:
             while True:
                 # Simulating temperature data
                 temperature = random.randint(min_temp, max_temp)
-                msg = self.client_id + "/" + str(round(temperature, 2))
-                self.client.publish(self.topic, msg)
+                msg = {
+                    'sys_id': self.client_id,
+                    'payload': temperature
+                }
+                json_message = json.dumps(msg)
+                self.client.publish(self.topic, json_message)
                 time.sleep(sleep)  # Simulate sensor update interval
             alive_thread.join()
         except Exception as e:
@@ -82,8 +92,12 @@ class SensorClient:
             while True:
                 # Simulating humidity data
                 humidity = random.randint(min_temp, max_temp)
-                msg = self.client_id + "/" + str(humidity)
-                self.client.publish(self.topic, msg)
+                msg = {
+                    'sys_id': self.client_id,
+                    'payload': humidity
+                }
+                json_message = json.dumps(msg)
+                self.client.publish(self.topic, json_message)
                 time.sleep(sleep)  # Simulate sensor update interval
             alive_thread.join()
         except Exception as e:
@@ -114,8 +128,12 @@ class SensorClient:
             while True:
                 # Simulating water data
                 water = random.randint(min_temp, max_temp)
-                msg = self.client_id + "/" + str(water)
-                self.client.publish(self.topic, msg)
+                msg = {
+                    'sys_id': self.client_id,
+                    'payload': water
+                }
+                json_message = json.dumps(msg)
+                self.client.publish(self.topic, json_message)
                 time.sleep(sleep)  # Simulate sensor update interval
             alive_thread.join()
         except Exception as e:

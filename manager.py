@@ -1,5 +1,6 @@
 import paho.mqtt.client as mqtt
 from sqlclass import IoTDatabase
+import json
 
 # TOPIC = "manager"
 BROKER_ADDRESS = "localhost"
@@ -9,10 +10,10 @@ PASSWORD = 'password'
 
 
 # functin: update_data(self, sys_id, name, status, keepAlive, value)
-def IsKeepAlive(msg_split, topic):
+def IsKeepAlive(jsonMsg, topic):
     try:
         if "keepalive" in topic:
-            db.update_data(int(msg_split[0]), keepAlive=msg_split[1])
+            db.update_data(int(jsonMsg['sys_id']), keepAlive=jsonMsg['payload'])
             return True
         else:
             return False
@@ -20,13 +21,13 @@ def IsKeepAlive(msg_split, topic):
         print(f"Error in keepAlive: {e}")
 
 
-def IsRGBSensor(msg_split, topic):
+def IsRGBSensor(jsonMsg, topic):
     try:
         if "RGB" in topic:
-            if msg_split[1] == "on" or msg_split[1] == "off":
-                db.update_data(int(msg_split[0]), status=msg_split[1])
+            if jsonMsg['payload'] == "on" or jsonMsg['payload'] == "off":
+                db.update_data(int(jsonMsg['sys_id']), status=jsonMsg['payload'])
             else:
-                db.update_data(int(msg_split[0]), value=msg_split[1])
+                db.update_data(int(jsonMsg['sys_id']), value=jsonMsg['payload'])
             return True
         else:
             return False
@@ -34,14 +35,14 @@ def IsRGBSensor(msg_split, topic):
         print(f"Error in RGB: {e}")
 
 
-def IsTempSensor(msg_split, topic):
+def IsTempSensor(jsonMsg, topic):
     try:
         if "Temperature" in topic:
-            if msg_split[1] == "on" or msg_split[1] == "off":
-                db.update_data(int(msg_split[0]), status=msg_split[1])
+            if jsonMsg['payload'] == "on" or jsonMsg['payload'] == "off":
+                db.update_data(int(jsonMsg['sys_id']), status=jsonMsg['payload'])
             else:
-                db.update_data(int(msg_split[0]), value=msg_split[1])
-                db.update_data(int(msg_split[0]), status="on")
+                db.update_data(int(jsonMsg['sys_id']), value=jsonMsg['payload'])
+                db.update_data(int(jsonMsg['sys_id']), status="on")
             return True
         else:
             return False
@@ -49,14 +50,14 @@ def IsTempSensor(msg_split, topic):
         print(f"Error in keepAlive thread: {e}")
 
 
-def IsHumiditySensor(msg_split, topic):
+def IsHumiditySensor(jsonMsg, topic):
     try:
         if "Humidity" in topic:
-            if msg_split[1] == "on" or msg_split[1] == "off":
-                db.update_data(int(msg_split[0]), status=msg_split[1])
+            if jsonMsg['payload'] == "on" or jsonMsg['payload'] == "off":
+                db.update_data(int(jsonMsg['sys_id']), status=jsonMsg['payload'])
             else:
-                db.update_data(int(msg_split[0]), value=msg_split[1])
-                db.update_data(int(msg_split[0]), status="on")
+                db.update_data(int(jsonMsg['sys_id']), value=jsonMsg['payload'])
+                db.update_data(int(jsonMsg['sys_id']), status="on")
             return True
         else:
             return False
@@ -64,10 +65,10 @@ def IsHumiditySensor(msg_split, topic):
         print(f"Error in keepAlive thread: {e}")
 
 
-def IsDoorLockSensor(msg_split, topic):
+def IsDoorLockSensor(jsonMsg, topic):
     try:
         if "DoorLock" in topic:
-            db.update_data(int(msg_split[0]), value=msg_split[1])
+            db.update_data(int(jsonMsg['sys_id']), value=jsonMsg['payload'])
             return True
         else:
             return False
@@ -75,14 +76,14 @@ def IsDoorLockSensor(msg_split, topic):
         print(f"Error in keepAlive thread: {e}")
 
 
-def IsWaterLevelSensor(msg_split, topic):
+def IsWaterLevelSensor(jsonMsg, topic):
     try:
         if 'WaterLevel' in topic:
-            if msg_split[1] == "on" or msg_split[1] == "off":
-                db.update_data(int(msg_split[0]), status=msg_split[1])
+            if jsonMsg['payload'] == "on" or jsonMsg['payload'] == "off":
+                db.update_data(int(jsonMsg['sys_id']), status=jsonMsg['payload'])
             else:
-                db.update_data(int(msg_split[0]), value=msg_split[1])
-                db.update_data(int(msg_split[0]), status="on")
+                db.update_data(int(jsonMsg['sys_id']), value=jsonMsg['payload'])
+                db.update_data(int(jsonMsg['sys_id']), status="on")
             return True
         else:
             return False
@@ -90,14 +91,14 @@ def IsWaterLevelSensor(msg_split, topic):
         print(f"Error in keepAlive thread: {e}")
 
 
-def IsAirconditionerSensor(msg_split, topic):
+def IsAirconditionerSensor(jsonMsg, topic):
     try:
         if 'Airconditioner' in topic:
-            if msg_split[1] == "on" or msg_split[1] == "off":
-                db.update_data(int(msg_split[0]), status=msg_split[1])
+            if jsonMsg['payload'] == "on" or jsonMsg['payload'] == "off":
+                db.update_data(int(jsonMsg['sys_id']), status=jsonMsg['payload'])
             else:
-                db.update_data(int(msg_split[0]), value=msg_split[1])
-                db.update_data(int(msg_split[0]), status="on")
+                db.update_data(int(jsonMsg['sys_id']), value=jsonMsg['payload'])
+                db.update_data(int(jsonMsg['sys_id']), status="on")
             return True
         else:
             return False
@@ -109,26 +110,25 @@ def IsAirconditionerSensor(msg_split, topic):
 def on_message_received(client, userdata, message):
     topic = message.topic
     msg = message.payload.decode('utf-8')
-    msg_split = msg.split('/')
-    # 0:keepalive or device; 1:ID; 2:msg.
-    if len(msg_split) == 2:
+    jsonMsg = json.loads(msg)
+    try:
         # Check the type of sensor and handle accordingly
-        if IsKeepAlive(msg_split, topic):
+        if IsKeepAlive(jsonMsg, topic):
             return
-        elif IsRGBSensor(msg_split, topic):
+        elif IsRGBSensor(jsonMsg, topic):
             return
-        elif IsTempSensor(msg_split, topic):
+        elif IsTempSensor(jsonMsg, topic):
             return
-        elif IsDoorLockSensor(msg_split, topic):
+        elif IsDoorLockSensor(jsonMsg, topic):
             return
-        elif IsWaterLevelSensor(msg_split, topic):
+        elif IsWaterLevelSensor(jsonMsg, topic):
             return
-        elif IsHumiditySensor(msg_split, topic):
+        elif IsHumiditySensor(jsonMsg, topic):
             return
-        elif IsAirconditionerSensor(msg_split, topic):
+        elif IsAirconditionerSensor(jsonMsg, topic):
             return
-    else:
-        print("Wrong message format!")
+    except KeyError as e:
+        print(f"Wrong message format!: {e}")
 
 
 if __name__ == "__main__":
