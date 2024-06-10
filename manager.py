@@ -9,7 +9,16 @@ USERNAME = 'username'
 PASSWORD = 'password'
 
 
-# functin: update_data(self, sys_id, name, status, keepAlive, value)
+def checkIfShouldTurnOnAC(value):
+    if value >= 30:
+        msg = {
+            'sys_id': 6,
+            'payload': 'on'
+        }
+        json_message = json.dumps(msg)
+        mqtt_client.publish('T_Airconditioner', json_message)
+
+
 def IsKeepAlive(jsonMsg, topic):
     try:
         if "keepalive" in topic:
@@ -43,6 +52,7 @@ def IsTempSensor(jsonMsg, topic):
             else:
                 db.update_data(int(jsonMsg['sys_id']), value=jsonMsg['payload'])
                 db.update_data(int(jsonMsg['sys_id']), status="on")
+                checkIfShouldTurnOnAC(jsonMsg['payload'])
             return True
         else:
             return False

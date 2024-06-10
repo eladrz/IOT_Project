@@ -23,7 +23,6 @@ class SensorClient:
         self.start_time = time.time()
         self.alive_topic = alive_topic
         self.keep_alive_interval = keep_alive_interval
-        # self.source = None  # Initialize source variable
 
     def connect(self):
         try:
