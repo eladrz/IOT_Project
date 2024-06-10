@@ -15,11 +15,7 @@ if __name__ == "__main__":
     # Create an instance of SensorClient
     client = SensorClient(ID_SENSOR, BROKER_ADDRESS, TOPIC,
                           KEEP_ALIVE_TOPIC, KEEP_ALIVE_SLEEP, USERNAME, PASSWORD)
-    	
-    #rgb_db = IoTDatabase()
-    #rgb_db.init_db()
-    #rgb_db.create_IOT_dev(int(ID_SENSOR),"RGB", "#000000", " ", "room1", " ", "sensors/RGB")
-    #rgb_db.print_database()
+
     try:
         # Connect to the MQTT broker
         client.connect()

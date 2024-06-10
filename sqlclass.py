@@ -93,12 +93,10 @@ class IoTDatabase:
                             c.execute("UPDATE iot_devices SET name=? WHERE sys_id=?", (name, sys_id))
                             conn.commit()
 
-                    else:
-                        if value is not None:
-                            c.execute("UPDATE iot_devices SET value=? WHERE sys_id=?", (value, sys_id))
-                            conn.commit()
-                        else:
-                            print("No updates provided.")
+                    if value is not None:
+                        c.execute("UPDATE iot_devices SET value=? WHERE sys_id=?", (value, sys_id))
+                        c.execute("UPDATE data SET LastUpdated=? WHERE sys_id=?", (self.timestamp(), sys_id))
+                        conn.commit()
                 else:
                     print(f"Error! System ID {sys_id} not found in the database.")
             except sqlite3.Error as e:

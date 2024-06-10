@@ -19,10 +19,6 @@ if __name__ == "__main__":
 
     # Connect to the MQTT broker
     client.connect()
-    #db = IoTDatabase()
-    #db.init_db()
-    #db.create_IOT_dev(int(ID_SENSOR),"DoorLock", "", "", "room1", dev_pub_topic = "", dev_sub_topic = "sensors/DoorLock")
-    #db.print_database()
     try:
         # Simulate the sensor
         client.simulate_doorLock_sensor()

@@ -3,6 +3,8 @@ import random
 import paho.mqtt.client as mqtt
 import threading
 import tkinter as tk
+
+import guiSensors
 from guiSensors import *
 import json
 
@@ -28,6 +30,8 @@ class SensorClient:
             if self.username and self.password:
                 self.client.username_pw_set(self.username, self.password)
             self.client.connect(self.broker_address)
+            if self.topic == "DoorLock":
+                guiSensors.get_sensor_client(self)
             self.client.loop_start()
         except Exception as e:
             print(f"Error connecting to broker: {e}")
@@ -41,12 +45,20 @@ class SensorClient:
 
     def on_message(self, client, userdata, msg):
         try:
-            payload = msg.payload.decode('utf-8')
             # handle the simulation
-            if self.topic == "RGB":
-                change_color(payload)
-            elif self.topic == "DoorLock":
-                check_signal(payload)
+            msgTopic = msg.topic
+            payload = msg.payload.decode('utf-8')
+            jsonMsg = json.loads(payload)
+            if msgTopic == "RGB":
+                if jsonMsg['payload'] == 'off':
+                    turn_off(self)
+                elif jsonMsg['payload'] == 'on':
+                    turn_on(self)
+                else:
+                    change_color_from_msg(jsonMsg['payload'])
+
+            elif msgTopic == "DoorLock":
+                check_signal(jsonMsg['payload'])
         except Exception as e:
             print(f"Exception: {e}")
 
@@ -107,7 +119,7 @@ class SensorClient:
         try:
             alive_thread = threading.Thread(target=self.keepAlive)
             alive_thread.start()
-            create_RGB_led()  # create the simulation
+            create_RGB_led(self)  # create the simulation
             alive_thread.join()
         except Exception as e:
             print(f"Error in RGB simulation: {e}")

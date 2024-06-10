@@ -68,7 +68,7 @@ def IsHumiditySensor(jsonMsg, topic):
 def IsDoorLockSensor(jsonMsg, topic):
     try:
         if "DoorLock" in topic:
-            db.update_data(int(jsonMsg['sys_id']), value=jsonMsg['payload'])
+            db.update_data(int(jsonMsg['sys_id']), value=jsonMsg['payload'], status=jsonMsg['payload'])
             return True
         else:
             return False
