@@ -7,7 +7,7 @@ CHECK_DoorLock_SEND = 3
 KEEP_ALIVE_TOPIC = "keepalive"
 KEEP_ALIVE_SLEEP = 2
 TOPIC = "sensors/DoorLock"
-BROKER_ADDRESS = "localhost"
+BROKER_ADDRESS = "192.168.211.54"
 ID_SENSOR = "3"
 
 USERNAME = 'username'

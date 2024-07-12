@@ -2,7 +2,7 @@ import paho.mqtt.client as mqtt
 from sqlclass import IoTDatabase
 
 TOPIC = "manager"
-BROKER_ADDRESS = "localhost"
+BROKER_ADDRESS = "192.168.211.54"
 BROKER_PORT = 1883
 USERNAME = 'username'
 PASSWORD = 'password'
