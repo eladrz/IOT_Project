@@ -2,7 +2,7 @@ import paho.mqtt.client as mqtt
 from sqlclass import IoTDatabase
 import json
 
-# TOPIC = "manager"
+
 BROKER_ADDRESS = "localhost"
 BROKER_PORT = 1883
 USERNAME = 'username'
@@ -17,6 +17,22 @@ def checkIfShouldTurnOnAC(value):
         }
         json_message = json.dumps(msg)
         mqtt_client.publish('T_Airconditioner', json_message)
+
+
+def IsDatabase(topic):
+    try:
+        if "get" in topic:
+            data = db.sendData()
+            if data:
+                mqtt_client.publish(topic.replace("get", "response"), data)
+            return True
+        elif "send" in topic:
+            return True
+        else:
+            return False
+    except Exception as e:
+        print(f"Error in IsDatabase: {e}")
+
 
 
 def IsKeepAlive(jsonMsg, topic):
@@ -124,6 +140,8 @@ def on_message_received(client, userdata, message):
     try:
         # Check the type of sensor and handle accordingly
         if IsKeepAlive(jsonMsg, topic):
+            return
+        elif IsDatabase(topic):
             return
         elif IsRGBSensor(jsonMsg, topic):
             return

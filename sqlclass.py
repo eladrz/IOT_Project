@@ -1,3 +1,4 @@
+import json
 import sqlite3
 from datetime import datetime
 
@@ -151,6 +152,35 @@ class IoTDatabase:
                 conn.close()
         else:
             print("Error! Database connection is not established.")
+
+    import json
+
+    def sendData(self):
+        conn = self.create_connection()
+        if conn is not None:
+            try:
+                cur = conn.cursor()
+                cur.execute("SELECT * FROM data")
+                rows = cur.fetchall()
+                data = []
+                for i, row in enumerate(rows):
+                    device_data = {
+                        'sys_id': row[0],
+                        'name': row[1],
+                        'LastUpdated': row[2],
+                        'status': row[3],
+                        'keepAlive': row[4]
+                    }
+                    data.append(device_data)
+                formatted_data = json.dumps(data)
+                return formatted_data
+            except sqlite3.Error as e:
+                print(e)
+            finally:
+                conn.close()
+        else:
+            print("Error! Database connection is not established.")
+            return None
 
 
 if __name__ == '__main__':
