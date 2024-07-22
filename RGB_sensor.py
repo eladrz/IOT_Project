@@ -4,7 +4,7 @@ from sensor_class import SensorClient
 
 KEEP_ALIVE_TOPIC = "keepalive"
 KEEP_ALIVE_SLEEP = 2
-TOPIC = "sensors/RGB"
+TOPIC = "RGB"
 BROKER_ADDRESS = "192.168.211.54"
 ID_SENSOR = "1"
 

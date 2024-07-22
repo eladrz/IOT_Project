@@ -1,84 +1,165 @@
 import paho.mqtt.client as mqtt
 from sqlclass import IoTDatabase
+import json
 
-TOPIC = "manager"
+# TOPIC = "manager"
+
 BROKER_ADDRESS = "192.168.211.54"
 BROKER_PORT = 1883
 USERNAME = 'username'
 PASSWORD = 'password'
 
-# functin: update_data(self, sys_id, name, status, keepAlive, value)
-def IsKeepAlive(msg_split):
-	if "keepalive" in msg_split[0]:
-		db.update_data(int(msg_split[1]),keepAlive=msg_split[2])
-		return True
-	else:
-		return False
 
-def IsRGBSensor(msg_split):
-	if "rgb" in msg_split[0]:
-		if msg_split[2] == "on" or msg_split[2] == "off":
-			db.update_data(int(msg_split[1]),status=msg_split[2])
-		else:
-			db.update_data(int(msg_split[1]),value=msg_split[2])
-		return True
-	else:
-		return False
-		
-def IsTempSensor(msg_split):
-	if "temp" in msg_split[0]:
-		if msg_split[2] == "on" or msg_split[2] == "off":
-			db.update_data(int(msg_split[1]),status=msg_split[2])
-		else:
-			db.update_data(int(msg_split[1]),value=msg_split[2])
-			db.update_data(int(msg_split[1]),status="on")
-		return True
-	else:
-		return False
+def checkIfShouldTurnOnAC(value):
+    if value >= 30:
+        msg = {
+            'sys_id': 6,
+            'payload': 'on'
+        }
+        json_message = json.dumps(msg)
+        mqtt_client.publish('T_Airconditioner', json_message)
 
-def IshumiditySensor(msg_split):
-	if "humidity" in msg_split[0]:
-		if msg_split[2] == "on" or msg_split[2] == "off":
-			db.update_data(int(msg_split[1]),status=msg_split[2])
-		else:
-			db.update_data(int(msg_split[1]),value=msg_split[2])
-			db.update_data(int(msg_split[1]),status="on")
-		return True
-	else:
-		return False
 
-def IsDoorLockSensor(msg_split):
-	if "DoorLock" in msg_split[0]:
-		db.update_data(int(msg_split[1]),value=msg_split[2])
-		return True
-	else:
-		return False
-		
-def IsWaterLevelSensor(msg_split):
-	if "waterLevel" in msg_split[0]:
-		if msg_split[2] == "on" or msg_split[2] == "off":
-			db.update_data(int(msg_split[1]),status=msg_split[2])
-		else:
-			db.update_data(int(msg_split[1]),value=msg_split[2])
-		return True
-	else:
-		return False
+def IsDatabase(topic):
+    try:
+        if "get" in topic:
+            data = db.sendData()
+            if data:
+                mqtt_client.publish(topic.replace("get", "response"), data)
+            return True
+        elif "send" in topic:
+            return True
+        else:
+            return False
+    except Exception as e:
+        print(f"Error in IsDatabase: {e}")
+
+
+
+def IsKeepAlive(jsonMsg, topic):
+    try:
+        if "keepalive" in topic:
+            db.update_data(int(jsonMsg['sys_id']), keepAlive=jsonMsg['payload'])
+            return True
+        else:
+            return False
+    except Exception as e:
+        print(f"Error in keepAlive: {e}")
+
+
+def IsRGBSensor(jsonMsg, topic):
+    try:
+        if "RGB" in topic:
+            if jsonMsg['payload'] == "on" or jsonMsg['payload'] == "off":
+                db.update_data(int(jsonMsg['sys_id']), status=jsonMsg['payload'])
+            else:
+                db.update_data(int(jsonMsg['sys_id']), value=jsonMsg['payload'])
+            return True
+        else:
+            return False
+    except Exception as e:
+        print(f"Error in RGB: {e}")
+
+
+def IsTempSensor(jsonMsg, topic):
+    try:
+        if "Temperature" in topic:
+            if jsonMsg['payload'] == "on" or jsonMsg['payload'] == "off":
+                db.update_data(int(jsonMsg['sys_id']), status=jsonMsg['payload'])
+            else:
+                db.update_data(int(jsonMsg['sys_id']), value=jsonMsg['payload'])
+                db.update_data(int(jsonMsg['sys_id']), status="on")
+                checkIfShouldTurnOnAC(jsonMsg['payload'])
+            return True
+        else:
+            return False
+    except Exception as e:
+        print(f"Error in keepAlive thread: {e}")
+
+
+def IsHumiditySensor(jsonMsg, topic):
+    try:
+        if "Humidity" in topic:
+            if jsonMsg['payload'] == "on" or jsonMsg['payload'] == "off":
+                db.update_data(int(jsonMsg['sys_id']), status=jsonMsg['payload'])
+            else:
+                db.update_data(int(jsonMsg['sys_id']), value=jsonMsg['payload'])
+                db.update_data(int(jsonMsg['sys_id']), status="on")
+            return True
+        else:
+            return False
+    except Exception as e:
+        print(f"Error in keepAlive thread: {e}")
+
+
+def IsDoorLockSensor(jsonMsg, topic):
+    try:
+        if "DoorLock" in topic:
+            db.update_data(int(jsonMsg['sys_id']), value=jsonMsg['payload'], status=jsonMsg['payload'])
+            return True
+        else:
+            return False
+    except Exception as e:
+        print(f"Error in keepAlive thread: {e}")
+
+
+def IsWaterLevelSensor(jsonMsg, topic):
+    try:
+        if 'WaterLevel' in topic:
+            if jsonMsg['payload'] == "on" or jsonMsg['payload'] == "off":
+                db.update_data(int(jsonMsg['sys_id']), status=jsonMsg['payload'])
+            else:
+                db.update_data(int(jsonMsg['sys_id']), value=jsonMsg['payload'])
+                db.update_data(int(jsonMsg['sys_id']), status="on")
+            return True
+        else:
+            return False
+    except Exception as e:
+        print(f"Error in keepAlive thread: {e}")
+
+
+def IsAirconditionerSensor(jsonMsg, topic):
+    try:
+        if 'Airconditioner' in topic:
+            if jsonMsg['payload'] == "on" or jsonMsg['payload'] == "off":
+                db.update_data(int(jsonMsg['sys_id']), status=jsonMsg['payload'])
+            else:
+                db.update_data(int(jsonMsg['sys_id']), value=jsonMsg['payload'])
+                db.update_data(int(jsonMsg['sys_id']), status="on")
+            return True
+        else:
+            return False
+    except Exception as e:
+        print(f"Error in keepAlive thread: {e}")
+
 
 # Define a callback function to handle incoming messages
 def on_message_received(client, userdata, message):
-    #print(f"Received message on topic '{message.topic}': {message.payload.decode()}")
+    topic = message.topic
     msg = message.payload.decode('utf-8')
-    # the 0 check the name of the sensor, 1 - the ID, 2 - the msg
-    msg_split = msg.split('/')
-    IsKeepAlive(msg_split)
-    IsRGBSensor(msg_split)
-    IsTempSensor(msg_split)
-    IsDoorLockSensor(msg_split)
-    IsWaterLevelSensor(msg_split)
-    IshumiditySensor(msg_split)
-    
-    
-    
+    jsonMsg = json.loads(msg)
+    try:
+        # Check the type of sensor and handle accordingly
+        if IsKeepAlive(jsonMsg, topic):
+            return
+        elif IsDatabase(topic):
+            return
+        elif IsRGBSensor(jsonMsg, topic):
+            return
+        elif IsTempSensor(jsonMsg, topic):
+            return
+        elif IsDoorLockSensor(jsonMsg, topic):
+            return
+        elif IsWaterLevelSensor(jsonMsg, topic):
+            return
+        elif IsHumiditySensor(jsonMsg, topic):
+            return
+        elif IsAirconditionerSensor(jsonMsg, topic):
+            return
+    except KeyError as e:
+        print(f"Wrong message format!: {e}")
+
+
 if __name__ == "__main__":
     # Initialize the MQTT client
     mqtt_client = mqtt.Client()
@@ -91,8 +172,8 @@ if __name__ == "__main__":
 
     # Connect to the MQTT broker
     mqtt_client.connect(BROKER_ADDRESS, port=BROKER_PORT)
-    mqtt_client.subscribe(TOPIC)
-    
+    mqtt_client.subscribe("#")
+
     #connect to the data base
     db = IoTDatabase()
     db.init_db()
@@ -106,5 +187,3 @@ if __name__ == "__main__":
     except KeyboardInterrupt:
         # Disconnect from the broker when Ctrl+C is pressed
         mqtt_client.disconnect()
-
-
